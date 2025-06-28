@@ -1,0 +1,24 @@
+<svg viewBox="0 0 261 66" xmlns="http://www.w3.org/2000/svg">
+  <!-- Troupe wordmark with aperture icon -->
+  <defs>
+    <radialGradient id="goldGradientWM">
+      <stop offset="0%" style="stop-color:#ca8f04;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a67c00;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Aperture icon -->
+  <g transform="translate(33, 33)">
+    <path d="M0,-25 L7,-7 L25,0 L7,7 L0,25 L-7,7 L-25,0 L-7,-7 Z" 
+          fill="url(#goldGradientWM)" opacity="0.85"/>
+    <circle r="4" fill="#1a1a1a"/>
+  </g>
+  
+  <!-- TROUPE text -->
+  <text x="75" y="42" 
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif" 
+        font-size="36" 
+        font-weight="300" 
+        fill="#ffffff" 
+        letter-spacing="2">TROUPE</text>
+</svg>

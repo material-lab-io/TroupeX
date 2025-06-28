@@ -1,0 +1,21 @@
+@use 'sass:color';
+@use '../mastodon/variables' as *;
+@use 'variables' as *;
+@use '../mastodon/functions' as *;
+
+body {
+  --dropdown-border-color: #e0e0e0;
+  --dropdown-background-color: #ffffff;
+  --modal-border-color: #e0e0e0;
+  --modal-background-color: #ffffff;
+  --background-border-color: #e0e0e0;
+  --background-color: #f3f2ef; // LinkedIn gray background
+  --background-color-tint: rgba(243, 242, 239, 80%);
+  --background-filter: blur(10px);
+  --on-surface-color: rgba(0, 0, 0, 0.04);
+  --surface-background-color: #ffffff; // White cards
+  --surface-variant-background-color: #ffffff; // White cards
+  --card-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 3px rgba(0, 0, 0, 0.04);
+  --input-placeholder-color: #666666;
+  --input-background-color: #ffffff;
+}

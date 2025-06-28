@@ -1,0 +1,12 @@
+<svg viewBox="0 0 79 79" xmlns="http://www.w3.org/2000/svg">
+  <!-- Film aperture design for Troupe -->
+  <g transform="translate(39.5, 39.5)">
+    <!-- Outer ring -->
+    <circle r="35" fill="none" stroke="#ca8f04" stroke-width="2" opacity="0.8"/>
+    <!-- Aperture blades -->
+    <path d="M0,-30 L8,-8 L30,0 L8,8 L0,30 L-8,8 L-30,0 L-8,-8 Z" fill="#ca8f04" opacity="0.9"/>
+    <!-- Inner detail -->
+    <circle r="10" fill="#1a1a1a"/>
+    <circle r="8" fill="none" stroke="#ca8f04" stroke-width="0.5" opacity="0.6"/>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+tunnel: troupex-dev
+credentials-file: /home/kanaba/.cloudflared/troupex-dev.json
+
+ingress:
+  - hostname: troupex-dev.materiallab.io
+    service: http://localhost:3000
+  - service: http_status:404
+EOF < /dev/null

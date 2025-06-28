@@ -1,0 +1,41 @@
+/* Force white background for status cards in light theme - Nuclear option */
+
+body.theme-mastodon-light .status,
+body.theme-mastodon-light .detailed-status,
+body.theme-mastodon-light .notification,
+body.theme-mastodon-light .entry,
+body.theme-mastodon-light .conversation__content,
+body.theme-mastodon-light .account-card,
+body.theme-mastodon-light .status__wrapper,
+body.theme-mastodon-light .activity-stream .entry,
+body:not(.theme-default):not(.theme-contrast) .status,
+body:not(.theme-default):not(.theme-contrast) .detailed-status {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #191919 !important;
+}
+
+/* Force gray background for main UI */
+body.theme-mastodon-light,
+body.theme-mastodon-light .ui,
+body.theme-mastodon-light .columns-area,
+body.theme-mastodon-light .column > .scrollable {
+  background-color: #f3f2ef !important;
+}
+
+/* Force text colors */
+body.theme-mastodon-light .status__content,
+body.theme-mastodon-light .status__content p,
+body.theme-mastodon-light .display-name__html {
+  color: #191919 !important;
+}
+
+/* Ensure child elements don't override */
+body.theme-mastodon-light .status * {
+  background-color: transparent !important;
+}
+
+body.theme-mastodon-light .status .media-gallery,
+body.theme-mastodon-light .status .video-player {
+  background-color: #f5f5f5 !important;
+}

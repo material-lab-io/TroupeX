@@ -1,0 +1,134 @@
+// ULTIMATE FIX for black status cards in light theme
+// This targets every possible selector and scenario
+
+// First, ensure CSS variables are properly set at the root
+:root {
+  &.theme-mastodon-light,
+  &:has(body.theme-mastodon-light) {
+    --surface-variant-background-color: #ffffff !important;
+    --surface-background-color: #ffffff !important;
+  }
+}
+
+// Target body with theme class
+body.theme-mastodon-light {
+  // Set variables on body as well
+  --surface-variant-background-color: #ffffff !important;
+  --surface-background-color: #ffffff !important;
+  
+  // Target all status elements with maximum specificity
+  .status,
+  article.status,
+  div.status,
+  [class="status"],
+  [class~="status"],
+  [class|="status"],
+  [class^="status "],
+  [class*=" status "],
+  [class*=" status"],
+  [class$=" status"] {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    
+    // Use pseudo-element as fallback
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ffffff;
+      z-index: -1;
+      pointer-events: none;
+    }
+  }
+  
+  // Target status in various containers
+  .column,
+  .columns-area,
+  .scrollable,
+  .timeline,
+  .activity-stream,
+  .conversation,
+  .notification,
+  .detailed-status__wrapper {
+    .status {
+      background: #ffffff !important;
+      background-color: #ffffff !important;
+    }
+  }
+  
+  // Override any inline styles
+  .status[style],
+  [style*="background"] .status {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
+  
+  // Target focusable status
+  .focusable.status,
+  .status.focusable,
+  .focusable .status {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    
+    &:focus,
+    &:hover {
+      background: #ffffff !important;
+      background-color: #ffffff !important;
+    }
+  }
+  
+  // Override troupe-cards fallbacks
+  .status {
+    // Redefine the CSS variable locally
+    --surface-variant-background-color: #ffffff !important;
+    
+    // Apply with !important
+    background: var(--surface-variant-background-color, #ffffff) !important;
+    background-color: #ffffff !important;
+  }
+}
+
+// Use @layer to ensure our styles take precedence
+@layer overrides {
+  body.theme-mastodon-light .status {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
+}
+
+// Media query to ensure styles apply
+@media all {
+  body.theme-mastodon-light .status {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
+}
+
+// Print media to ensure it's not a media query issue
+@media print, screen {
+  body.theme-mastodon-light .status {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
+}
+
+// Last resort - use attribute selector on data attributes
+body.theme-mastodon-light {
+  [data-id] {
+    &.status {
+      background: #ffffff !important;
+      background-color: #ffffff !important;
+    }
+  }
+  
+  [tabindex] {
+    &.status {
+      background: #ffffff !important;
+      background-color: #ffffff !important;
+    }
+  }
+}

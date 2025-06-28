@@ -1,0 +1,127 @@
+# Development docker-compose with hot reload
+version: '3'
+
+services:
+  db:
+    restart: always
+    image: postgres:14-alpine
+    shm_size: 256mb
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+    volumes:
+      - ./postgres14:/var/lib/postgresql/data
+    environment:
+      - 'POSTGRES_HOST_AUTH_METHOD=trust'
+
+  redis:
+    restart: always
+    image: redis:7-alpine
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+    volumes:
+      - ./redis:/data
+
+  # Development web server with hot reload
+  web:
+    image: ghcr.io/mastodon/mastodon:v4.4.2
+    restart: always
+    env_file: .env.development
+    command: bash -c "rm -f /mastodon/tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - '127.0.0.1:3000:3000'
+    depends_on:
+      - db
+      - redis
+    volumes:
+      # Mount source code for hot reload
+      - ./app:/opt/mastodon/app:cached
+      - ./config:/opt/mastodon/config:cached
+      - ./lib:/opt/mastodon/lib:cached
+      - ./public/system:/opt/mastodon/public/system
+      # Exclude node_modules and other build artifacts
+      - /opt/mastodon/node_modules
+      - /opt/mastodon/public/packs
+      - /opt/mastodon/tmp
+    environment:
+      - RAILS_ENV=development
+      - NODE_ENV=development
+      - RAILS_SERVE_STATIC_FILES=true
+      - RAILS_LOG_TO_STDOUT=true
+
+  # Webpack dev server for frontend hot reload
+  webpack:
+    image: ghcr.io/mastodon/mastodon:v4.4.2
+    restart: always
+    env_file: .env.development
+    command: ./bin/webpack-dev-server
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - '127.0.0.1:3035:3035'
+    depends_on:
+      - db
+      - redis
+    volumes:
+      # Mount source code
+      - ./app:/opt/mastodon/app:cached
+      - ./config:/opt/mastodon/config:cached
+      - ./lib:/opt/mastodon/lib:cached
+      # Exclude build artifacts
+      - /opt/mastodon/node_modules
+      - /opt/mastodon/public/packs
+    environment:
+      - RAILS_ENV=development
+      - NODE_ENV=development
+
+  streaming:
+    image: ghcr.io/mastodon/mastodon:v4.4.2
+    restart: always
+    env_file: .env.development
+    command: node ./streaming
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - '127.0.0.1:4000:4000'
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./streaming:/opt/mastodon/streaming:cached
+    environment:
+      - NODE_ENV=development
+      - STREAMING_CLUSTER_NUM=1
+
+  sidekiq:
+    image: ghcr.io/mastodon/mastodon:v4.4.2
+    restart: always
+    env_file: .env.development
+    command: bundle exec sidekiq
+    depends_on:
+      - db
+      - redis
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - ./app:/opt/mastodon/app:cached
+      - ./config:/opt/mastodon/config:cached
+      - ./lib:/opt/mastodon/lib:cached
+      - ./public/system:/opt/mastodon/public/system
+      - /opt/mastodon/node_modules
+    environment:
+      - RAILS_ENV=development
+      - RAILS_LOG_TO_STDOUT=true
+
+networks:
+  external_network:
+  internal_network:
+    internal: true

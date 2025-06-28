@@ -1,0 +1,55 @@
+// Troupe minimal footer styling
+@use 'variables' as *;
+
+.link-footer {
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.08);
+  
+  p {
+    margin: 0;
+    color: #666666;
+    
+    strong {
+      color: #191919;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    a {
+      color: #0a66c2;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: #004182;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Hide the about section on homepage
+.getting-started__wrapper {
+  .column-subheading {
+    display: none;
+  }
+  
+  .column-link[href="/about"] {
+    display: none;
+  }
+}
+
+// Clean up the getting started section
+.getting-started {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  
+  .getting-started__trends {
+    display: none; // Hide trends section
+  }
+}

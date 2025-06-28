@@ -1,0 +1,46 @@
+@use 'sass:color';
+@use 'functions' as *;
+@use 'variables' as *;
+
+:root {
+  --dropdown-border-color: #e0e0e0;
+  --dropdown-background-color: #ffffff;
+  --dropdown-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --modal-background-color: #{rgba($white, 0.95)};
+  --modal-background-variant-color: #{$white};
+  --modal-border-color: #e0e0e0;
+  --background-border-color: #e0e0e0;
+  --background-filter: none;
+  --background-color: #f3f2ef; // LinkedIn gray background
+  --background-color-tint: #{rgba(#f3f2ef, 0.95)};
+  --surface-background-color: #ffffff; // White cards
+  --surface-variant-background-color: #ffffff;
+  --surface-variant-active-background-color: #fafafa;
+  --on-surface-color: #{color.adjust($ui-base-color, $alpha: -0.5)};
+  --avatar-border-radius: 8px;
+  --media-outline-color: #{rgba($gold-star, 0.15)};
+  --overlay-icon-shadow: drop-shadow(0 0 8px #{rgba($base-shadow-color, 0.35)});
+  --error-background-color: #{darken($error-red, 16%)};
+  --error-active-background-color: #{darken($error-red, 12%)};
+  --on-error-color: #fff;
+  --rich-text-container-color: rgba(87, 24, 60, 100%);
+  --rich-text-text-color: rgba(255, 175, 212, 100%);
+  --rich-text-decorations-color: rgba(128, 58, 95, 100%);
+  --nested-card-background: #ffffff;
+  --nested-card-text: #{$secondary-text-color};
+  --nested-card-border: 1px solid #e0e0e0;
+  --card-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 3px rgba(0, 0, 0, 0.04);
+  --card-hover-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.07);
+  --input-placeholder-color: #{$dark-text-color};
+  --input-background-color: var(--surface-variant-background-color);
+  --on-input-color: #{$secondary-text-color};
+}
+
+body {
+  // Variable for easily inverting directional UI elements,
+  --text-x-direction: 1;
+
+  &.rtl {
+    --text-x-direction: -1;
+  }
+}

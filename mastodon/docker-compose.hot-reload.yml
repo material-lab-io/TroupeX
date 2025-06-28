@@ -1,0 +1,99 @@
+# Hot reload development setup using mounted volumes
+version: '3'
+
+services:
+  db:
+    restart: always
+    image: postgres:14-alpine
+    shm_size: 256mb
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+    volumes:
+      - ./postgres14:/var/lib/postgresql/data
+    environment:
+      - 'POSTGRES_HOST_AUTH_METHOD=trust'
+
+  redis:
+    restart: always
+    image: redis:7-alpine
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+    volumes:
+      - ./redis:/data
+
+  # Use the already built image but mount source code
+  web:
+    image: mastodon-web:latest
+    restart: always
+    env_file: .env.production
+    # Run Foreman to start both Rails and Vite dev server
+    command: bash -c "rm -f /opt/mastodon/tmp/pids/server.pid && foreman start -f Procfile.dev"
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - '127.0.0.1:3000:3000'
+      - '127.0.0.1:4036:4036'  # Vite dev server
+    depends_on:
+      - db
+      - redis
+    volumes:
+      # Mount your source code
+      - ./app/javascript:/opt/mastodon/app/javascript:cached
+      - ./app/views:/opt/mastodon/app/views:cached
+      - ./app/controllers:/opt/mastodon/app/controllers:cached
+      - ./app/models:/opt/mastodon/app/models:cached
+      - ./config:/opt/mastodon/config:cached
+      - ./public/system:/opt/mastodon/public/system
+      # Preserve node_modules and other dependencies
+      - /opt/mastodon/node_modules
+      - /opt/mastodon/public/packs
+    environment:
+      - RAILS_ENV=production
+      - NODE_ENV=development
+      - RAILS_SERVE_STATIC_FILES=true
+      - BIND=0.0.0.0
+      # Enable Vite dev server
+      - VITE_RUBY_HOST=0.0.0.0
+
+  streaming:
+    image: mastodon-streaming:latest
+    restart: always
+    env_file: .env.production
+    command: node ./streaming/index.js
+    networks:
+      - external_network
+      - internal_network
+    ports:
+      - '127.0.0.1:4000:4000'
+    depends_on:
+      - db
+      - redis
+    environment:
+      - NODE_ENV=production
+      - STREAMING_CLUSTER_NUM=1
+
+  sidekiq:
+    image: mastodon-web:latest
+    restart: always
+    env_file: .env.production
+    command: bundle exec sidekiq
+    depends_on:
+      - db
+      - redis
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - ./public/system:/opt/mastodon/public/system
+    environment:
+      - RAILS_ENV=production
+
+networks:
+  external_network:
+  internal_network:
+    internal: true

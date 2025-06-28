@@ -1,0 +1,219 @@
+// Troupex Custom Branding Styles
+@use 'variables' as *;
+
+// Import Helvetica Neue font
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// Custom Troupex title styling
+.column-header__title {
+  &.troupex-title {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 18px !important;
+    color: #191919 !important;
+    
+    .troupex-super {
+      font-size: 12px !important;
+      vertical-align: super !important;
+      font-weight: 700 !important;
+      color: #0a66c2 !important;
+    }
+  }
+}
+
+// Search input positioning below column header
+.home-timeline-search {
+  padding: 12px 16px;
+  background: transparent;
+  border-bottom: 1px solid #e0e0e0;
+  
+  .search {
+    margin: 0;
+    
+    .search__input {
+      background: #eef3f8 !important;
+      border: 1px solid #d0d0d0 !important;
+      border-radius: 24px !important;
+      padding: 8px 16px !important;
+      font-size: 14px !important;
+      color: #191919 !important;
+      
+      &::placeholder {
+        color: #666666 !important;
+      }
+      
+      &:focus {
+        background: #ffffff !important;
+        border-color: #0a66c2 !important;
+        box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2) !important;
+        outline: none !important;
+      }
+    }
+    
+    .search__icon-wrapper {
+      .search__icon {
+        color: #666666 !important;
+      }
+    }
+  }
+}
+
+// LinkedIn-style compose form
+.compose-form {
+  &.linkedin-style {
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+    margin: 16px !important;
+    padding: 0 !important;
+    
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12) !important;
+    }
+    
+    .compose-form__highlightable {
+      background: transparent !important;
+      border-radius: 8px !important;
+      
+      .compose-form__scrollable {
+        padding: 16px !important;
+        
+        .autosuggest-textarea__textarea {
+          background: transparent !important;
+          border: none !important;
+          font-size: 16px !important;
+          line-height: 1.4 !important;
+          color: #191919 !important;
+          min-height: 60px !important;
+          resize: none !important;
+          
+          &::placeholder {
+            color: #666666 !important;
+            font-size: 16px !important;
+          }
+          
+          &:focus {
+            outline: none !important;
+            box-shadow: none !important;
+          }
+        }
+      }
+      
+      .compose-form__footer {
+        border-top: 1px solid #e0e0e0 !important;
+        background: #f8f9fa !important;
+        padding: 12px 16px !important;
+        border-radius: 0 0 8px 8px !important;
+        
+        .compose-form__actions {
+          .compose-form__buttons {
+            .icon-button {
+              color: #666666 !important;
+              padding: 8px !important;
+              
+              &:hover {
+                color: #0a66c2 !important;
+                background: rgba(10, 102, 194, 0.08) !important;
+                border-radius: 4px !important;
+              }
+            }
+          }
+          
+          .compose-form__submit {
+            .button {
+              background: #0a66c2 !important;
+              color: #ffffff !important;
+              border-radius: 20px !important;
+              font-weight: 600 !important;
+              font-size: 14px !important;
+              padding: 6px 16px !important;
+              border: none !important;
+              
+              &:hover {
+                background: #004182 !important;
+              }
+              
+              &:disabled {
+                background: #e0e0e0 !important;
+                color: #999999 !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Enhanced wordmark logo sizing (2x)
+.logo--wordmark {
+  height: 48px !important; // Double the original size
+  width: auto !important;
+  max-width: none !important;
+  
+  // Ensure it doesn't break layout
+  object-fit: contain !important;
+}
+
+// Navigation panel logo sizing adjustment
+.navigation-panel__logo {
+  .column-link--logo {
+    .logo--wordmark {
+      height: 48px !important;
+      width: auto !important;
+    }
+  }
+}
+
+// Status card styling reference for compose form
+.status {
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  margin-bottom: 12px !important;
+  
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+// Ensure proper spacing and layout
+.columns-area__panels__main {
+  .column {
+    background: transparent !important;
+    
+    .column-header {
+      background: #ffffff !important;
+      border: 1px solid #e0e0e0 !important;
+      border-bottom: none !important;
+      border-radius: 8px 8px 0 0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+    }
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .home-timeline-search {
+    padding: 8px 12px;
+    
+    .search .search__input {
+      font-size: 16px !important; // Prevent zoom on iOS
+    }
+  }
+  
+  .compose-form.linkedin-style {
+    margin: 8px !important;
+    
+    .compose-form__highlightable {
+      .compose-form__scrollable {
+        padding: 12px !important;
+      }
+    }
+  }
+  
+  .logo--wordmark {
+    height: 36px !important; // Slightly smaller on mobile
+  }
+}

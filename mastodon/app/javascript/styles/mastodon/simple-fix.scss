@@ -1,0 +1,26 @@
+// Simple fix for status cards - override troupe-cards
+.status {
+  // Remove the CSS variable that's causing issues
+  background: #ffffff;
+  background-color: #ffffff;
+  
+  // For light theme specifically
+  .theme-mastodon-light & {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+  }
+}
+
+// Also fix in application context
+.app-body {
+  .status {
+    background: #ffffff;
+    background-color: #ffffff;
+  }
+}
+
+// Fix the scrollable area
+.scrollable {
+  background: #f3f2ef;
+  background-color: #f3f2ef;
+}

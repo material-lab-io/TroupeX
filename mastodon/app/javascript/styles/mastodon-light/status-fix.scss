@@ -1,0 +1,123 @@
+// Force white background for status cards in light theme
+// NUCLEAR OPTION - Override all possible selectors with maximum specificity
+
+// Target the root html element to ensure our theme overrides work
+html.theme-mastodon-light,
+body.theme-mastodon-light {
+  // Main status cards - use multiple selectors for maximum coverage
+  .status,
+  article.status,
+  div.status,
+  .status__wrapper .status,
+  .focusable.status,
+  .scrollable .status,
+  .column .status,
+  .timeline .status,
+  .activity-stream .status,
+  .activity-stream .entry,
+  .conversation .status,
+  .conversation__content .status,
+  .notification .status,
+  .notification + .status,
+  .detailed-status__wrapper .status,
+  [class*="status"][class*="wrapper"] .status {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #191919 !important;
+  }
+  
+  // Double-target to increase specificity
+  .status.status {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+  
+  // Triple-target for stubborn elements
+  .columns-area .column .scrollable .status {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+  
+  // Target by attribute selectors as well
+  [class~="status"],
+  [class|="status"],
+  [class^="status"],
+  [class*=" status"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+  
+  // Target status with any data attributes
+  [data-id] .status,
+  .status[data-id],
+  [tabindex] .status,
+  .status[tabindex] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+}
+
+// Use :where() to reduce specificity of child elements
+:where(.theme-mastodon-light) .status :where(*:not(.media-gallery):not(.video-player):not(.audio-player)) {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+// Media elements
+.theme-mastodon-light .status {
+  .media-gallery,
+  .video-player,
+  .audio-player {
+    background-color: #f5f5f5 !important;
+  }
+}
+
+// Text colors
+.theme-mastodon-light {
+  .status__content,
+  .status__content *,
+  .status .display-name,
+  .status .display-name__html {
+    color: #191919 !important;
+  }
+  
+  .status__relative-time,
+  .status .display-name__account {
+    color: #666666 !important;
+  }
+}
+
+// Override any inline styles using attribute selectors
+.theme-mastodon-light .status[style*="background"],
+.theme-mastodon-light .status[style*="Background"] {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+// Target potential parent containers that might set backgrounds
+.theme-mastodon-light {
+  .scrollable > div:has(.status),
+  .timeline > div:has(.status),
+  div:has(> .status):not(.status) {
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+}
+
+// Notification containers
+.theme-mastodon-light .notification {
+  background-color: #ffffff !important;
+  
+  .status {
+    background-color: transparent !important;
+    border: none !important;
+  }
+}
+
+// Use @supports to apply fixes for modern browsers
+@supports (background: #ffffff) {
+  .theme-mastodon-light .status {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+}
