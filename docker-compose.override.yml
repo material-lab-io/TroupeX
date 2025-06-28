@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    volumes:
+      # Mount local files for hot reload development
+      - ./mastodon/app/javascript:/mastodon/app/javascript:ro
+      - ./mastodon/public/packs:/mastodon/public/packs
+      - ./mastodon/tmp/cache:/mastodon/tmp/cache
+    environment:
+      # Development mode for better debugging
+      RAILS_LOG_LEVEL: debug

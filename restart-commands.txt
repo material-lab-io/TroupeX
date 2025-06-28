@@ -1,0 +1,3 @@
+sudo kill -HUP 1950077
+sudo kill -TERM 1949876
+sudo kill -TERM 1950175
