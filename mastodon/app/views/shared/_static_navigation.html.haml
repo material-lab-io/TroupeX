@@ -1,0 +1,49 @@
+-# Top navigation bar (TroupeX branding)
+.troupex-top-nav
+  .troupex-nav-left
+    %a.troupex-wordmark{ href: '/home' }
+      %span.troupe-text Troupe
+      %span.troupex-x X
+  
+  %button.troupex-hamburger{ 'aria-label': 'Menu', onclick: 'toggleMobileNav()' }
+    %span.hamburger-icon
+      %svg{ xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "currentColor" }
+        %path{ d: "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" }
+
+-# Bottom navigation bar
+.ui__navigation-bar
+  - if user_signed_in?
+    .ui__navigation-bar__items.active
+      %a.ui__navigation-bar__item{ href: '/home', 'aria-label': 'Home' }
+        %svg{ xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "currentColor" }
+          %path{ d: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" }
+      
+      %a.ui__navigation-bar__item{ href: '/explore', 'aria-label': 'Search' }
+        %svg{ xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "currentColor" }
+          %path{ d: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" }
+      
+      %a.ui__navigation-bar__item{ href: '/publish', 'aria-label': 'New Post' }
+        %svg{ xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "currentColor" }
+          %path{ d: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" }
+      
+      %a.ui__navigation-bar__item{ href: '/settings/profile', 'aria-label': 'Profile', class: controller.class.name.start_with?('Settings::') ? 'active' : '' }
+        %svg{ xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "currentColor" }
+          - if controller.class.name.start_with?('Settings::')
+            %path{ d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" }
+          - else
+            %path{ d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" }
+  - else
+    .ui__navigation-bar__sign-up
+      %a.button{ href: '/auth/sign_up' } Create account
+      %a.button.button-tertiary{ href: '/auth/sign_in' } Login
+
+:javascript
+  function toggleMobileNav() {
+    // Simple toggle for mobile navigation
+    const body = document.body;
+    if (body.classList.contains('navigation-panel-open')) {
+      body.classList.remove('navigation-panel-open');
+    } else {
+      body.classList.add('navigation-panel-open');
+    }
+  }

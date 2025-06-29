@@ -1,22 +1,57 @@
 // Troupex Custom Branding Styles
 @use 'variables' as *;
 
-// Import Helvetica Neue font
+// Import fonts - Horizon for branding, Inter for UI
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// Horizon Bold font - Multiple sources for better reliability
+@font-face {
+  font-family: 'Horizon';
+  src: url('https://db.onlinewebfonts.com/t/50333c7551860f0e47e0f3c382f3bf31.woff2') format('woff2'),
+       url('https://db.onlinewebfonts.com/t/50333c7551860f0e47e0f3c382f3bf31.woff') format('woff'),
+       url('https://www.cufonfonts.com/download/font/horizon') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Ensure bold weight is applied
+@font-face {
+  font-family: 'Horizon';
+  src: local('Horizon Bold'), local('Horizon-Bold'),
+       url('https://db.onlinewebfonts.com/t/50333c7551860f0e47e0f3c382f3bf31.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+// Alternative Horizon font sources
+@import url('https://fonts.cdnfonts.com/css/horizon?styles=103023');
+
+// Backup geometric font if Horizon fails to load
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
 
 // Custom Troupex title styling
 .column-header__title {
-  &.troupex-title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 18px !important;
+  .troupex-title {
+    font-family: 'Horizon', 'Orbitron', 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 700 !important; // Force bold weight
+    font-size: 22px !important; // Slightly larger for bold
     color: #191919 !important;
+    letter-spacing: 1px !important; // Better spacing for bold
+    text-transform: uppercase !important;
     
     .troupex-super {
-      font-size: 12px !important;
+      font-size: 10px !important;
       vertical-align: super !important;
-      font-weight: 700 !important;
-      color: #0a66c2 !important;
+      font-weight: 700 !important; // Force bold weight
+      color: #000000 !important;
+      position: relative !important;
+      top: -2px !important;
+      margin-left: 1px !important;
+      text-shadow: 
+        0 0 1px #ffffff,
+        0 0 1px #ffffff,
+        0 0 1px #ffffff !important;
     }
   }
 }
@@ -29,14 +64,17 @@
   
   .search {
     margin: 0;
+    position: relative;
     
     .search__input {
       background: #eef3f8 !important;
       border: 1px solid #d0d0d0 !important;
       border-radius: 24px !important;
-      padding: 8px 16px !important;
+      padding: 8px 44px 8px 44px !important; // Add padding for icons on both sides
       font-size: 14px !important;
       color: #191919 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
       
       &::placeholder {
         color: #666666 !important;
@@ -51,9 +89,28 @@
     }
     
     .search__icon-wrapper {
+      position: absolute !important;
+      left: 12px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      pointer-events: none !important;
+      
       .search__icon {
         color: #666666 !important;
+        width: 20px !important;
+        height: 20px !important;
       }
+      
+      .search__icon--clear-button {
+        display: none !important; // Hide the clear button as it's floating
+      }
+    }
+    
+    // Fix search popout positioning
+    .search__popout {
+      top: calc(100% + 5px) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     }
   }
 }
@@ -166,20 +223,104 @@
   }
 }
 
-// Status card styling reference for compose form
-.status {
-  background: #ffffff !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 8px !important;
-  margin-bottom: 12px !important;
-  
-  &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+// Override all dark theme styles - force light theme for posts
+body,
+.app-body,
+.ui,
+.columns-area {
+  .status {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    margin-bottom: 12px !important;
+    color: #000000 !important;
+    padding: 16px !important;
+    
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    // Force all text to be black
+    * {
+      color: #000000 !important;
+    }
+    
+    // Ensure all text elements are visible
+    .status__display-name {
+      color: #000000 !important;
+      
+      .display-name__html {
+        color: #000000 !important;
+      }
+      
+      .display-name__account {
+        color: #666666 !important;
+      }
+    }
+    
+    .status__content {
+      color: #000000 !important;
+      
+      p {
+        color: #000000 !important;
+      }
+    }
+    
+    .status__relative-time {
+      color: #666666 !important;
+      
+      time {
+        color: #666666 !important;
+      }
+    }
+    
+    // Fix action bar icons
+    .status__action-bar {
+      .icon-button {
+        color: #666666 !important;
+        
+        svg {
+          fill: #666666 !important;
+        }
+        
+        &:hover {
+          color: #000000 !important;
+          
+          svg {
+            fill: #000000 !important;
+          }
+        }
+        
+        &.active {
+          color: #0a66c2 !important;
+          
+          svg {
+            fill: #0a66c2 !important;
+          }
+        }
+      }
+    }
+    
+    // Fix links and hashtags
+    a {
+      color: #0a66c2 !important;
+      
+      &:hover {
+        color: #004182 !important;
+      }
+      
+      &.mention.hashtag {
+        color: #0a66c2 !important;
+      }
+    }
   }
 }
 
 // Ensure proper spacing and layout
 .columns-area__panels__main {
+  background: #f5f5f5 !important; // Light grey background for main area
+  
   .column {
     background: transparent !important;
     
@@ -193,8 +334,902 @@
   }
 }
 
+// Make sure the superscript X is properly styled everywhere
+.troupex-title,
+span.troupex-title {
+  font-family: 'Horizon', 'Orbitron', 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !important;
+  font-weight: 700 !important;
+  color: #191919 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  
+  .troupex-super {
+    font-size: 0.5em !important;
+    vertical-align: super !important;
+    font-weight: 700 !important; // Force bold weight
+    color: #0a66c2 !important;
+    position: relative !important;
+    top: -0.3em !important;
+    margin-left: 2px !important;
+    letter-spacing: 0 !important;
+    text-transform: uppercase !important;
+  }
+}
+
+// TroupeX Top Navigation Bar - Clean Integration
+.troupex-top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px; // Slimmer height for cleaner look
+  background: #000000;
+  z-index: 10000; // Higher than sliding menu overlay
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+  .troupex-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .troupex-back-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    color: #ffffff;
+    
+    svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .troupex-wordmark {
+    font-family: 'Horizon', 'Orbitron', Arial, sans-serif !important;
+    font-size: 24px !important; // Slightly smaller for cleaner look
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.5px !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    display: flex;
+    align-items: baseline;
+    
+    .troupe-text {
+      color: #ffffff !important;
+    }
+    
+    .troupex-x {
+      font-size: 14px !important;
+      color: #000000 !important;
+      position: relative !important;
+      top: -6px !important;
+      margin-left: 2px !important;
+      font-weight: 700 !important;
+      text-shadow: 
+        0 0 1px #ffffff,
+        0 0 1px #ffffff,
+        0 0 1px #ffffff !important;
+    }
+  }
+
+  .troupex-hamburger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    position: relative;
+    z-index: 10001; // Ensure it's above everything
+    
+    .hamburger-icon {
+      width: 22px;
+      height: 22px;
+      color: #ffffff;
+      pointer-events: none; // Ensure clicks go to button
+      
+      svg {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+      }
+    }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// Clean UI layout with top and bottom nav
+.ui {
+  padding-top: 48px !important; // Account for top nav height
+  padding-bottom: 56px !important; // Account for bottom nav height
+  height: 100vh !important;
+  box-sizing: border-box !important;
+  position: relative;
+}
+
+.columns-area {
+  margin-top: 0 !important;
+  height: 100% !important; // Use 100% of parent instead of viewport
+  padding-top: 0 !important;
+  box-sizing: border-box !important;
+}
+
+// Ensure the navigation panel works with both navs
+.columns-area__panels {
+  height: 100% !important;
+  
+  .columns-area__panels__pane {
+    height: 100% !important;
+    
+    // Ensure scrollable areas don't go under bottom nav
+    .scrollable {
+      padding-bottom: 10px !important;
+    }
+  }
+}
+
+// Keep default navigation bar but adjust for top nav and icon distribution
+.ui__navigation-bar {
+  // Keep the default navigation visible
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #000000 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  min-height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  
+  // Distribute navigation items evenly
+  .ui__navigation-bar__items {
+    display: flex !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+    
+    // Make each icon take equal space with white color
+    .ui__navigation-bar__item {
+      flex: 1 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      max-width: none !important;
+      color: #ffffff !important;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+      
+      &:hover,
+      &.active {
+        opacity: 1;
+      }
+      
+      .icon {
+        color: #ffffff !important;
+        fill: #ffffff !important;
+        
+        svg {
+          fill: #ffffff !important;
+        }
+      }
+      
+      .icon-with-badge {
+        color: #ffffff !important;
+        
+        .icon {
+          color: #ffffff !important;
+          fill: #ffffff !important;
+        }
+      }
+    }
+  }
+  
+  // Fix sign-up section visibility on mobile
+  .ui__navigation-bar__sign-up {
+    position: relative !important;
+    display: flex !important;
+    gap: 8px !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    align-items: center !important;
+    
+    .button {
+      flex: 1 !important;
+      max-width: 140px !important;
+      font-size: 14px !important;
+      padding: 8px 16px !important;
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      
+      &.button-tertiary {
+        background: transparent !important;
+        border: 1px solid #ffffff !important;
+        color: #ffffff !important;
+      }
+      
+      &:not(.button-tertiary) {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+    }
+  }
+  
+  // When user is not signed in, ensure proper layout
+  &:not(:has(.ui__navigation-bar__items.active)) {
+    flex-direction: row !important;
+    padding: 8px !important;
+    
+    .ui__navigation-bar__sign-up {
+      margin: 0 !important;
+    }
+  }
+}
+
+// Hide all column headers in favor of our top nav
+.column-header,
+h1.column-header,
+.column > .column-header,
+.column h1[class*="column-header"] {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  position: absolute !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+// Hide the column back button (handled by top nav)
+.column-back-button,
+#tabs-bar__portal {
+  display: none !important;
+}
+
+// Adjust column content to start at top
+.column {
+  > .scrollable {
+    padding-top: 0 !important;
+  }
+  
+  // Remove any header spacing
+  > h1.column-header + * {
+    margin-top: 0 !important;
+  }
+}
+
+// Remove column header completely and its space
+.column > h1.column-header {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+// Home timeline specific adjustments - Remove search bar
+.home-timeline-search {
+  display: none !important;
+}
+
+// Ensure timeline content is visible with proper colors
+.home-timeline {
+  .scrollable {
+    display: block !important;
+    height: 100% !important;
+    background: #f5f5f5 !important;
+  }
+}
+
+// Force light theme for all content areas
+.columns-area,
+.columns-area__panels__main,
+.column,
+.scrollable,
+.status-list,
+.status-list__wrapper {
+  background: #f5f5f5 !important;
+  background-color: #f5f5f5 !important;
+  color: #000000 !important;
+}
+
+// Remove any dark theme classes
+body:not(.theme-contrast) {
+  .columns-area {
+    --background-color: #f5f5f5 !important;
+  }
+}
+
+// Ensure the first element after removed header has no gap
+.column > *:first-child,
+.column > *:nth-child(2) {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+// Specific fix for home timeline layout
+.column {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important; // Allow flexbox to work properly
+  
+  > * {
+    flex-shrink: 0;
+  }
+  
+  > .scrollable {
+    flex: 1 1 auto !important;
+    min-height: 0 !important; // Critical for flex children
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    // Ensure content doesn't go under bottom nav
+    padding-bottom: 20px !important;
+    
+    // Ensure status list is visible
+    .status-list {
+      display: block !important;
+    }
+  }
+}
+
+// Ensure main content area fits between both navs
+.columns-area__panels__main {
+  height: 100% !important;
+  overflow: hidden !important;
+  background: #f5f5f5 !important;
+  
+  // Reset any dark theme colors
+  color: #000000 !important;
+  
+  // Allow overflow on mobile
+  @media (max-width: 768px) {
+    overflow: visible !important;
+  }
+}
+
+// Navigation panel adjustments - Dark grey minimal UI
+.navigation-panel {
+  padding-top: 0 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  padding-bottom: 20px !important;
+  background: #1a1a1a !important;
+  
+  // Hide horizontal rules
+  hr {
+    display: none !important;
+  }
+  
+  // Hide search input in navigation panel
+  .search {
+    display: none !important;
+  }
+}
+
+// Simplified navigation panel - minimal UI
+.navigation-panel__menu {
+  // Hide all navigation items by default
+  > * {
+    display: none !important;
+  }
+  
+  // Show only notifications and preferences  
+  > a:nth-child(4), // Notifications link (after compose, home, explore)
+  > a[href="/settings/preferences"] {
+    display: flex !important;
+  }
+}
+
+// Hide additional panels in navigation
+.navigation-panel {
+  .navigation-panel__list-panel,
+  .navigation-panel__followed-tags-panel,
+  .navigation-panel__legal,
+  .getting-started__trends,
+  .trends {
+    display: none !important;
+  }
+  
+  // Also hide logo since we have top nav
+  .navigation-panel__logo {
+    display: none !important;
+  }
+}
+
+// Ensure navigation panel has proper structure
+.navigation-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  
+  // Remove top padding since we have profile section
+  &::before {
+    display: none;
+  }
+  
+  // Ensure profile is at the top
+  .navigation-panel__profile {
+    order: -1;
+    flex-shrink: 0;
+  }
+}
+
+// Make the entire sidebar area dark grey
+.columns-area__panels__pane--navigational {
+  background: #1a1a1a !important;
+  
+  .columns-area__panels__pane__inner {
+    background: #1a1a1a !important;
+  }
+}
+
+
+// Minimal profile section - Dark grey theme
+.navigation-panel__profile {
+  padding: 20px;
+  margin-bottom: 20px;
+  background: #242424;
+  border-radius: 12px;
+  margin: 16px;
+  
+  &__avatar {
+    display: block;
+    margin-bottom: 12px;
+    width: 56px;
+    height: 56px;
+    
+    .account__avatar {
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 50%;
+      border: 2px solid #333;
+    }
+  }
+  
+  &__name {
+    margin-bottom: 12px;
+    
+    strong {
+      display: block;
+      color: #e0e0e0;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    span {
+      color: #888;
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+  
+  &__edit {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #333;
+    color: #e0e0e0;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+    
+    &:hover {
+      background: #404040;
+    }
+  }
+}
+
+// Simplify navigation menu items
+.navigation-panel__menu {
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px; // Reduced gap from 5px to 2px
+  
+  // Style navigation links - minimal dark grey theme
+  .column-link {
+    padding: 12px 16px !important;
+    margin: 4px 8px !important;
+    border-radius: 10px !important;
+    color: #e0e0e0 !important;
+    text-decoration: none !important;
+    transition: background 0.2s ease !important;
+    
+    &:hover {
+      background: #2a2a2a !important;
+    }
+    
+    .icon {
+      color: #888 !important;
+      margin-right: 12px !important;
+    }
+    
+    span {
+      color: #e0e0e0 !important;
+      font-size: 15px !important;
+    }
+  }
+  
+  // Hide the more button
+  > button {
+    display: none !important;
+  }
+}
+
+// Drawer adjustments - ensure it works on all screen sizes
+.drawer {
+  padding-top: 0 !important;
+  height: 100% !important;
+  overflow-y: hidden !important; // Let inner handle scrolling
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+// Ensure modals and dropdowns appear above both navs
+.dropdown-menu,
+.modal-root {
+  z-index: 10000 !important;
+}
+
+// Ensure compose modal works properly
+.modal-root__container {
+  padding-top: 48px !important;
+  padding-bottom: 56px !important;
+}
+
+// Announcements container adjustment
+.announcements {
+  margin-top: 0 !important;
+  border-top: none !important;
+}
+
+// Status list adjustments
+.status-list {
+  padding-top: 0 !important;
+}
+
+// Remove any gaps from column containers
+.columns-area__panels__main .column {
+  gap: 0 !important;
+}
+
+// Force timeline content to start immediately after search
+.home-timeline-search + .scrollable {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+// Remove any default column padding
+.column > .scrollable.scrollable--flex {
+  padding-top: 0 !important;
+  
+  > div:first-child {
+    margin-top: 0 !important;
+  }
+}
+
 // Mobile responsiveness
 @media (max-width: 768px) {
+  // Keep navigation panel available for sliding menu
+  .columns-area__panels__pane--navigational {
+    position: fixed !important;
+    top: 48px !important; // Start below top nav
+    left: 0 !important;
+    height: calc(100vh - 48px - 56px) !important; // Full height minus both navs
+    z-index: 9998 !important;
+    width: 250px !important; // Consistent drawer width
+    pointer-events: none; // Allow clicks through when closed
+    
+    &.columns-area__panels__pane--overlay {
+      pointer-events: auto; // Enable clicks when open
+      
+      &::before {
+        content: '';
+        position: fixed;
+        top: 48px; // Start overlay below top nav
+        left: 0;
+        right: 0;
+        bottom: 56px; // End overlay above bottom nav
+        background: rgba(0, 0, 0, 0.4);
+        z-index: -1;
+      }
+    }
+    
+    .columns-area__panels__pane__inner {
+      width: 250px !important; // Slightly smaller for mobile
+      height: 100% !important;
+      background: #1a1a1a !important;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+      pointer-events: auto; // Panel itself always clickable
+    }
+  }
+  
+  // Style navigation panel for mobile
+  .navigation-panel {
+    display: flex !important; // Keep it visible for sliding
+    background: #1a1a1a !important;
+    height: 100% !important;
+    padding-top: 12px !important; // Small padding since drawer starts below top nav
+    padding-bottom: 12px !important;
+    overflow-y: auto !important;
+    
+    // Hide logo on mobile
+    .navigation-panel__logo {
+      display: none !important;
+    }
+    
+    // Ensure profile shows in mobile
+    .navigation-panel__profile {
+      display: block !important;
+      margin: 12px !important;
+    }
+    
+    // Show only specific navigation items in mobile drawer
+    .columns-area__panels__pane--navigational {
+      .navigation-panel {
+        // Ensure profile is visible
+        .navigation-panel__profile {
+          display: block !important;
+        }
+        
+        .navigation-panel__menu {
+          // Hide all direct children first
+          > * {
+            display: none !important;
+          }
+          
+          // Show specific items based on structure
+          // Notifications is rendered as a NavLink with to="/notifications"
+          a[href="/notifications"] {
+            display: flex !important;
+          }
+          
+          // Preferences has href="/settings/preferences"
+          a[href="/settings/preferences"] {
+            display: flex !important;
+          }
+        }
+      }
+    }
+  }
+  
+  // Ensure drawer is visible on mobile
+  .drawer {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--background-color) !important;
+    height: 100% !important;
+  }
+  
+  
+  // Ensure main content is visible on mobile
+  .columns-area {
+    display: flex !important;
+    height: auto !important; // Let content determine height
+    min-height: calc(100vh - 48px - 56px) !important; // Minimum height
+    
+    .column {
+      display: flex !important;
+      flex-direction: column !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 100% !important;
+      
+      .scrollable {
+        display: block !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important; // Smooth scrolling on iOS
+        background: #f5f5f5 !important; // Ensure light background
+        
+        // Ensure all content is visible
+        > * {
+          display: block !important;
+        }
+      }
+    }
+  }
+  
+  // Fix main content area for mobile
+  .columns-area__panels__main {
+    width: 100% !important;
+    overflow: visible !important; // Change from hidden to visible
+    background: #f5f5f5 !important;
+    display: block !important;
+    height: auto !important;
+  }
+  
+  // Ensure panels structure works on mobile
+  .columns-area__panels {
+    display: block !important;
+    height: auto !important;
+    
+    .columns-area__panels__pane {
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+  }
+  
+  // Fix for iOS Safari
+  .ui {
+    height: 100vh !important;
+    height: -webkit-fill-available !important;
+  }
+  
+  // Fix navigation bar layout for sign-up buttons
+  .ui__navigation-bar {
+    // For logged out users on mobile
+    &:not(:has(.ui__navigation-bar__items.active)) {
+      flex-direction: row !important;
+      padding: 8px !important;
+      height: auto !important;
+      min-height: 56px !important;
+      
+      .ui__navigation-bar__sign-up {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 8px !important;
+        
+        .button {
+          min-height: 40px !important;
+          white-space: nowrap !important;
+          
+          span {
+            display: block !important;
+          }
+        }
+      }
+    }
+    
+    // For logged in users
+    &:has(.ui__navigation-bar__items.active) {
+      .ui__navigation-bar__items {
+        width: 100% !important;
+        padding: 0 !important;
+      }
+    }
+  }
+  
+  .troupex-top-nav {
+    height: 44px; // Slightly smaller on mobile
+    padding: 0 15px;
+    
+    .troupex-nav-left {
+      gap: 8px;
+    }
+    
+    .troupex-back-button {
+      padding: 4px;
+      
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+    
+    .troupex-wordmark {
+      font-size: 20px !important;
+      letter-spacing: 1px !important;
+      
+      .troupex-x {
+        font-size: 12px !important;
+        top: -5px !important;
+        color: #000000 !important;
+        text-shadow: 
+          0 0 1px #ffffff,
+          0 0 1px #ffffff,
+          0 0 1px #ffffff !important;
+      }
+    }
+    
+    .troupex-hamburger {
+      padding: 5px;
+      
+      .hamburger-icon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  
+  .ui {
+    padding-top: 44px !important;
+    padding-bottom: 56px !important; // Bottom nav on mobile
+  }
+  
+  .columns-area {
+    padding-top: 0 !important;
+  }
+  
+  .home-timeline-search {
+    top: 0 !important;
+  }
+  
+  .navigation-panel {
+    padding-top: 0 !important;
+    height: 100% !important;
+  }
+  
+  // Style the mobile drawer properly
+  .drawer {
+    padding-top: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--background-color) !important;
+    width: 100% !important;
+    
+    .drawer__header {
+      flex: 0 0 auto !important;
+      display: flex !important;
+      background: var(--background-color) !important;
+    }
+    
+    .drawer__pager {
+      flex: 1 1 auto !important;
+      display: flex !important;
+      overflow: hidden !important;
+    }
+    
+    .drawer__inner {
+      position: relative !important;
+      height: 100% !important;
+      background: var(--background-color) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      
+      .drawer__inner__mastodon {
+        display: none !important; // Hide mascot on mobile to save space
+      }
+      
+      // Ensure compose form is visible
+      .compose-form {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+      }
+    }
+  }
+  
+  // Ensure search component works on mobile
+  .search {
+    display: block !important;
+    padding: 10px !important;
+  }
+  
   .home-timeline-search {
     padding: 8px 12px;
     
@@ -215,5 +1250,283 @@
   
   .logo--wordmark {
     height: 36px !important; // Slightly smaller on mobile
+  }
+}
+
+// Settings page styling
+.troupex-logo {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 2px !important;
+  
+  .troupex-wordmark {
+    font-family: 'Horizon', 'Orbitron', 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 24px !important;
+    color: #191919 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+  }
+  
+  .troupex-x {
+    font-family: 'Horizon', 'Orbitron', 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    vertical-align: super !important;
+    color: #000000 !important;
+    position: relative !important;
+    top: -5px !important;
+    margin-left: 1px !important;
+    text-shadow: 
+      0 0 1px #ffffff,
+      0 0 1px #ffffff,
+      0 0 1px #ffffff !important;
+  }
+}
+
+// Settings page specific adjustments
+.settings-page {
+  padding: 20px !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  min-height: calc(100vh - 48px - 56px) !important; // Full height minus navs
+  background: #f5f5f5 !important;
+  
+  .content__heading {
+    margin-bottom: 20px !important;
+    padding-bottom: 15px !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    
+    h2 {
+      font-size: 24px !important;
+      font-weight: 600 !important;
+      color: #000000 !important;
+      margin: 0 0 10px 0 !important;
+    }
+  }
+  
+  // Form styling
+  form {
+    background: #ffffff !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px !important;
+    margin-top: 48px !important; // Account for fixed top nav
+    
+    form {
+      padding: 15px !important;
+    }
+  }
+}
+
+// Ensure proper spacing when using application layout
+body:not(.admin) {
+  .ui {
+    // Settings pages should have padding top for nav
+    &:has(.settings-page) {
+      padding-top: 48px !important;
+    }
+  }
+}
+
+// CRITICAL: Force light theme override - must be at end of file
+// Override any theme classes
+html,
+html.theme-mastodon-light,
+html.theme-mastodon-dark,
+body,
+body.theme-mastodon-light,
+body.theme-mastodon-dark,
+body.app-body {
+  .status,
+  .status.status-public,
+  .status.status-unlisted,
+  .status.status-private {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    
+    .status__info,
+    .status__content,
+    .status__action-bar {
+      background: transparent !important;
+      color: #000000 !important;
+    }
+    
+    .status__content__text {
+      color: #000000 !important;
+      
+      p {
+        color: #000000 !important;
+      }
+    }
+    
+    .display-name__html,
+    strong {
+      color: #000000 !important;
+    }
+  }
+  
+  // Force main area to be light
+  .columns-area__panels__main,
+  .column,
+  .scrollable {
+    background: #f5f5f5 !important;
+    background-color: #f5f5f5 !important;
+  }
+}
+
+// Settings pages with real navigation bars
+.settings-content-with-nav {
+  min-height: 100vh;
+  padding-top: 48px; // Account for top navigation
+  padding-bottom: 56px; // Account for bottom navigation
+  background: #f5f5f5;
+  
+  // Settings page content
+  .settings-page {
+    padding: 20px !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    
+    // Content heading styles
+    .content__heading {
+      margin-bottom: 20px !important;
+      
+      h2 {
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        color: #191919 !important;
+        margin-bottom: 16px !important;
+      }
+      
+      // Navigation tabs
+      &__tabs {
+        border-bottom: 1px solid #e0e0e0 !important;
+        margin-bottom: 20px !important;
+        
+        > div {
+          display: flex !important;
+          gap: 24px !important;
+          
+          a {
+            padding: 12px 0 !important;
+            border-bottom: 2px solid transparent !important;
+            color: #666 !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            
+            &:hover {
+              color: #191919 !important;
+            }
+            
+            &.selected,
+            &.active {
+              color: #0a66c2 !important;
+              border-bottom-color: #0a66c2 !important;
+            }
+            
+            .icon {
+              margin-right: 8px !important;
+              vertical-align: middle !important;
+            }
+          }
+        }
+      }
+    }
+    
+    // Form styling
+    .simple_form {
+      .fields-row {
+        display: flex !important;
+        gap: 20px !important;
+        margin-bottom: 20px !important;
+        
+        &__column {
+          flex: 1 !important;
+          
+          &-6 {
+            flex: 0 0 calc(50% - 10px) !important;
+          }
+        }
+      }
+      
+      .fields-group {
+        margin-bottom: 20px !important;
+        
+        label {
+          color: #191919 !important;
+          font-weight: 500 !important;
+          margin-bottom: 8px !important;
+          display: block !important;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        textarea {
+          width: 100% !important;
+          padding: 10px 12px !important;
+          border: 1px solid #d0d0d0 !important;
+          border-radius: 8px !important;
+          background: #ffffff !important;
+          font-size: 14px !important;
+          
+          &:focus {
+            border-color: #0a66c2 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2) !important;
+          }
+        }
+        
+        &__thumbnail {
+          max-width: 100% !important;
+          border-radius: 8px !important;
+          margin-bottom: 12px !important;
+        }
+      }
+      
+      .actions {
+        margin-top: 32px !important;
+        
+        button {
+          background: #0a66c2 !important;
+          color: white !important;
+          padding: 10px 24px !important;
+          border-radius: 24px !important;
+          border: none !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          transition: background 0.2s ease !important;
+          
+          &:hover {
+            background: #084c94 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile adjustments for settings
+@media (max-width: 768px) {
+  .settings-content-with-nav {
+    .settings-page {
+      padding: 16px !important;
+      
+      .fields-row {
+        flex-direction: column !important;
+        
+        &__column-6 {
+          flex: 1 1 100% !important;
+        }
+      }
+    }
   }
 }

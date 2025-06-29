@@ -19,6 +19,9 @@ module BrandingHelper
   end
 
   def render_logo
-    image_tag(frontend_asset_path('images/logo.svg'), alt: 'Mastodon', class: 'logo logo--icon')
+    content_tag(:div, class: 'logo logo--icon troupex-logo') do
+      content_tag(:span, 'TROUPE', class: 'troupex-wordmark') +
+      content_tag(:span, 'X', class: 'troupex-x')
+    end
   end
 end

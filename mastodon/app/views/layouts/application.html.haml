@@ -42,7 +42,12 @@
     = yield :header_tags
 
   %body{ class: body_classes }
-    = content_for?(:content) ? yield(:content) : yield
+    - if controller.class.name.start_with?('Settings::')
+      = render 'shared/static_navigation'
+      .settings-content-with-nav
+        = content_for?(:content) ? yield(:content) : yield
+    - else
+      = content_for?(:content) ? yield(:content) : yield
 
     .logo-resources{ 'tabindex' => '-1', 'inert' => true, 'aria-hidden' => 'true' }
       = inline_svg_tag 'logo-symbol-icon.svg'

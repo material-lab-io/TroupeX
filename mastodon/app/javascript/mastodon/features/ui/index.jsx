@@ -30,6 +30,7 @@ import initialState, { me, owner, singleUserMode, trendsEnabled, trendsAsLanding
 
 import BundleColumnError from './components/bundle_column_error';
 import { NavigationBar } from './components/navigation_bar';
+import { TroupeXNavigation } from './components/troupex_navigation';
 import { UploadArea } from './components/upload_area';
 import { HashtagMenuController } from './components/hashtag_menu_controller';
 import ColumnsAreaContainer from './containers/columns_area_container';
@@ -72,6 +73,7 @@ import {
   OnboardingFollows,
   Explore,
   Search,
+  Messages,
   About,
   PrivacyPolicy,
   TermsOfService,
@@ -187,6 +189,12 @@ class SwitchingColumnsArea extends PureComponent {
       redirect = <Redirect from='/' to='/about' exact />;
     }
 
+    // Handle settings routes by redirecting to server-side Rails routes
+    if (pathName.startsWith('/settings/')) {
+      window.location.href = pathName;
+      return null;
+    }
+
     return (
       <ColumnsContextProvider multiColumn={!singleColumn}>
         <ColumnsAreaContainer ref={this.setRef} singleColumn={singleColumn}>
@@ -231,6 +239,7 @@ class SwitchingColumnsArea extends PureComponent {
             <WrappedRoute path='/directory' component={Directory} content={children} />
             <WrappedRoute path='/explore' component={Explore} content={children} />
             <WrappedRoute path='/search' component={Search} content={children} />
+            <WrappedRoute path='/messages' component={Messages} content={children} />
             <WrappedRoute path={['/publish', '/statuses/new']} component={Compose} content={children} />
 
             <WrappedRoute path={['/@:acct', '/accounts/:id']} exact component={AccountTimeline} content={children} />
@@ -604,6 +613,7 @@ class UI extends PureComponent {
             {children}
           </SwitchingColumnsArea>
 
+          <TroupeXNavigation />
           <NavigationBar />
           {layout !== 'mobile' && <PictureInPicture />}
           <AlertsController />

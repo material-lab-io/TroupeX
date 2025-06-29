@@ -8,12 +8,10 @@ import { NavLink, useRouteMatch } from 'react-router-dom';
 import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
-import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
-import NotificationsActiveIcon from '@/material-icons/400-24px/notifications-fill.svg?react';
-import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
+import AccountCircleIcon from '@/material-icons/400-24px/account_circle.svg?react';
+import AccountCircleActiveIcon from '@/material-icons/400-24px/account_circle-fill.svg?react';
 import SearchIcon from '@/material-icons/400-24px/search.svg?react';
 import { openModal } from 'mastodon/actions/modal';
-import { toggleNavigation } from 'mastodon/actions/navigation';
 import { fetchServer } from 'mastodon/actions/server';
 import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
@@ -26,11 +24,10 @@ export const messages = defineMessages({
   home: { id: 'tabs_bar.home', defaultMessage: 'Home' },
   search: { id: 'tabs_bar.search', defaultMessage: 'Search' },
   publish: { id: 'tabs_bar.publish', defaultMessage: 'New Post' },
-  notifications: {
-    id: 'tabs_bar.notifications',
-    defaultMessage: 'Notifications',
+  profile: {
+    id: 'tabs_bar.profile',
+    defaultMessage: 'Profile',
   },
-  menu: { id: 'tabs_bar.menu', defaultMessage: 'Menu' },
 });
 
 const IconLabelButton: React.FC<{
@@ -53,31 +50,24 @@ const IconLabelButton: React.FC<{
   );
 };
 
-const NotificationsButton = () => {
-  const count = useAppSelector(selectUnreadNotificationGroupsCount);
+const ProfileButton = () => {
   const intl = useIntl();
+  const isActive = window.location.pathname.startsWith('/settings/');
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = '/settings/profile';
+  };
 
   return (
-    <IconLabelButton
-      to='/notifications'
-      icon={
-        <IconWithBadge
-          id='bell'
-          icon={NotificationsIcon}
-          count={count}
-          className=''
-        />
-      }
-      activeIcon={
-        <IconWithBadge
-          id='bell'
-          icon={NotificationsActiveIcon}
-          count={count}
-          className=''
-        />
-      }
-      title={intl.formatMessage(messages.notifications)}
-    />
+    <a
+      className={`ui__navigation-bar__item ${isActive ? 'active' : ''}`}
+      href='/settings/profile'
+      onClick={handleClick}
+      aria-label={intl.formatMessage(messages.profile)}
+    >
+      <Icon id='person' icon={isActive ? AccountCircleActiveIcon : AccountCircleIcon} />
+    </a>
   );
 };
 
@@ -152,13 +142,7 @@ const LoginOrSignUp: React.FC = () => {
 
 export const NavigationBar: React.FC = () => {
   const { signedIn } = useIdentity();
-  const dispatch = useAppDispatch();
-  const open = useAppSelector((state) => state.navigation.open);
   const intl = useIntl();
-
-  const handleClick = useCallback(() => {
-    dispatch(toggleNavigation());
-  }, [dispatch]);
 
   return (
     <div className='ui__navigation-bar'>
@@ -187,17 +171,9 @@ export const NavigationBar: React.FC = () => {
               to='/publish'
               icon={<Icon id='' icon={AddIcon} />}
             />
-            <NotificationsButton />
+            <ProfileButton />
           </>
         )}
-
-        <button
-          className={classNames('ui__navigation-bar__item', { active: open })}
-          onClick={handleClick}
-          aria-label={intl.formatMessage(messages.menu)}
-        >
-          <Icon id='' icon={MenuIcon} />
-        </button>
       </div>
     </div>
   );
