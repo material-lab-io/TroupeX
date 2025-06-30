@@ -1,0 +1,140 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mastodon_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4.4'
+        bundler-cache: true
+        working-directory: mastodon
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev libxml2-dev libxslt1-dev libidn11-dev libicu-dev libjemalloc-dev
+
+    - name: Setup test database
+      working-directory: mastodon
+      env:
+        RAILS_ENV: test
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASS: postgres
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+      run: |
+        cp .env.production.sample .env.test
+        bundle exec rails db:create
+        bundle exec rails db:schema:load
+
+    - name: Run RSpec tests
+      working-directory: mastodon
+      env:
+        RAILS_ENV: test
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASS: postgres
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+      run: bundle exec rspec
+
+    - name: Run Rubocop
+      working-directory: mastodon
+      run: bundle exec rubocop
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'yarn'
+        cache-dependency-path: mastodon/yarn.lock
+
+    - name: Install dependencies
+      working-directory: mastodon
+      run: |
+        corepack enable
+        corepack prepare yarn@4.9.2 --activate
+        yarn install --immutable
+
+    - name: Run ESLint
+      working-directory: mastodon
+      run: yarn lint:js
+
+    - name: Run Stylelint
+      working-directory: mastodon
+      run: yarn lint:css
+
+    - name: Run TypeScript check
+      working-directory: mastodon
+      run: yarn typecheck
+
+    - name: Run Jest tests
+      working-directory: mastodon
+      run: yarn test:js
+
+    - name: Check formatting
+      working-directory: mastodon
+      run: yarn format:check
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'

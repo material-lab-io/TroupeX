@@ -1,0 +1,82 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+    - name: Create .env.production file
+      run: |
+        echo "${{ secrets.PRODUCTION_ENV }}" | base64 -d > .env.production
+
+    - name: Deploy to DigitalOcean
+      env:
+        DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        DROPLET_USER: ${{ secrets.DROPLET_USER }}
+      run: |
+        # Copy necessary files to droplet
+        scp -o StrictHostKeyChecking=no .env.production ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/mastodon/.env.production
+        scp -o StrictHostKeyChecking=no docker-compose.production.yml ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
+        scp -o StrictHostKeyChecking=no scripts/deploy.sh ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
+        
+        # Execute deployment script
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "cd /home/${DROPLET_USER}/troupex && chmod +x deploy.sh && ./deploy.sh"
+
+    - name: Health check
+      env:
+        DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        SITE_URL: ${{ secrets.SITE_URL }}
+      run: |
+        echo "Waiting for application to be ready..."
+        sleep 30
+        
+        # Check if the application is responding
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL}/health || echo "000")
+        
+        if [ "$response" = "200" ]; then
+          echo "✅ Deployment successful! Application is healthy."
+        else
+          echo "❌ Deployment may have failed. HTTP response code: $response"
+          exit 1
+        fi
+
+    - name: Notify deployment status
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: |
+          Deployment to ${{ github.event.inputs.environment || 'production' }} ${{ job.status }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
