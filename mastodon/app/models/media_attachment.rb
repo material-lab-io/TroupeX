@@ -75,7 +75,7 @@ class MediaAttachment < ApplicationRecord
     }.freeze,
 
     small: {
-      pixels: 230_400, # 640x360px
+      pixels: 1_440_000, # 1600x900px - Higher quality for TroupeX
       file_geometry_parser: FastGeometryParser,
       blurhash: BLURHASH_OPTIONS,
     }.freeze,
