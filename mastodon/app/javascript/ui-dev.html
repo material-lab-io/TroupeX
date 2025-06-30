@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastodon UI Development</title>
+    
+    <!-- Import Vite client for HMR -->
+    <script type="module" src="http://localhost:3036/@vite/client"></script>
+    
+    <!-- Import application styles directly from Vite -->
+    <script type="module">
+        import '/styles/application.scss';
+    </script>
+    
+    <style>
+        /* Development helper styles */
+        .dev-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dev-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--surface-background-color, #fff);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .dev-section h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-text-color, #191919);
+        }
+        
+        .dev-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+    </style>
+</head>
+<body class="app-body">
+    <div class="dev-container">
+        <h1 style="font-size: 32px; margin-bottom: 40px;">Mastodon UI Development</h1>
+        
+        <!-- Colors Section -->
+        <div class="dev-section">
+            <h2>TroupeX Brand Colors</h2>
+            <div class="dev-grid">
+                <div style="background: #0a66c2; color: white; padding: 20px; border-radius: 4px;">
+                    Primary: #0a66c2
+                </div>
+                <div style="background: #dc004e; color: white; padding: 20px; border-radius: 4px;">
+                    Secondary: #dc004e
+                </div>
+                <div style="background: #f50057; color: white; padding: 20px; border-radius: 4px;">
+                    Accent: #f50057
+                </div>
+            </div>
+        </div>
+        
+        <!-- Buttons Section -->
+        <div class="dev-section">
+            <h2>Buttons</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="button">Primary Button</button>
+                <button class="button button--secondary">Secondary Button</button>
+                <button class="button button--destructive">Destructive</button>
+                <button class="button" disabled>Disabled Button</button>
+            </div>
+        </div>
+        
+        <!-- Status/Card Preview -->
+        <div class="dev-section">
+            <h2>Status Component</h2>
+            <article class="status">
+                <div class="status__wrapper">
+                    <div class="status__prepend">
+                        <div class="status__prepend-icon-wrapper">
+                            <i class="fa fa-retweet"></i>
+                        </div>
+                    </div>
+                    <div class="status__avatar">
+                        <div class="account__avatar" style="width: 48px; height: 48px; background: #0a66c2; border-radius: var(--avatar-border-radius, 8px);"></div>
+                    </div>
+                    <div class="status__content">
+                        <div class="status__info">
+                            <span class="status__display-name">
+                                <strong>TroupeX User</strong>
+                                <span>@troupex</span>
+                            </span>
+                            <time>2h</time>
+                        </div>
+                        <div class="status__content__text">
+                            <p>Welcome to TroupeX! This is a sample status to preview the UI styling. Check out how our custom theme looks!</p>
+                        </div>
+                        <div class="status__action-bar">
+                            <button class="icon-button"><i class="fa fa-reply"></i></button>
+                            <button class="icon-button"><i class="fa fa-retweet"></i></button>
+                            <button class="icon-button"><i class="fa fa-heart"></i></button>
+                            <button class="icon-button"><i class="fa fa-share"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+        <!-- Forms Section -->
+        <div class="dev-section">
+            <h2>Form Elements</h2>
+            <div class="simple_form">
+                <div class="input">
+                    <label>Text Input</label>
+                    <input type="text" placeholder="Enter text...">
+                </div>
+                
+                <div class="input">
+                    <label>Textarea</label>
+                    <textarea rows="3" placeholder="Enter longer text..."></textarea>
+                </div>
+                
+                <div class="input">
+                    <label>Select</label>
+                    <select>
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                    </select>
+                </div>
+                
+                <div class="input boolean">
+                    <label class="checkbox">
+                        <input type="checkbox">
+                        <span>Checkbox option</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Icons Test -->
+        <div class="dev-section">
+            <h2>Icons</h2>
+            <div style="display: flex; gap: 20px; font-size: 24px;">
+                <i class="fa fa-home"></i>
+                <i class="fa fa-bell"></i>
+                <i class="fa fa-envelope"></i>
+                <i class="fa fa-user"></i>
+                <i class="fa fa-cog"></i>
+                <i class="fa fa-search"></i>
+            </div>
+        </div>
+        
+        <!-- Typography -->
+        <div class="dev-section">
+            <h2>Typography</h2>
+            <h1 style="font-size: 32px; margin-bottom: 10px;">Heading 1</h1>
+            <h2 style="font-size: 24px; margin-bottom: 10px;">Heading 2</h2>
+            <h3 style="font-size: 20px; margin-bottom: 10px;">Heading 3</h3>
+            <p style="margin-bottom: 10px;">Regular paragraph text. This is how body text appears in the application.</p>
+            <p><strong>Bold text</strong> and <em>italic text</em> and <a href="#" style="color: #0a66c2;">link text</a></p>
+        </div>
+    </div>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>

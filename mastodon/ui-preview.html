@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastodon UI Preview</title>
+    
+    <!-- Load Vite client for HMR -->
+    <script type="module" src="http://localhost:3036/@vite/client"></script>
+    
+    <!-- Load main application styles -->
+    <link rel="stylesheet" href="http://localhost:3036/packs-dev/styles/application.scss">
+</head>
+<body class="app-body">
+    <div class="ui-preview">
+        <h1>Mastodon UI Style Preview</h1>
+        
+        <!-- Navigation Preview -->
+        <div class="tabs-bar__wrapper">
+            <div class="tabs-bar">
+                <a class="tabs-bar__link" href="#">
+                    <i class="fa fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a class="tabs-bar__link" href="#">
+                    <i class="fa fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+                <a class="tabs-bar__link" href="#">
+                    <i class="fa fa-globe"></i>
+                    <span>Explore</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Status/Card Preview -->
+        <div class="status">
+            <div class="status__wrapper">
+                <div class="status__avatar">
+                    <div class="account__avatar" style="width: 46px; height: 46px;">
+                        <img src="https://via.placeholder.com/46" alt="Avatar">
+                    </div>
+                </div>
+                <div class="status__content">
+                    <div class="status__display-name">
+                        <strong>Display Name</strong>
+                        <span>@username</span>
+                    </div>
+                    <div class="status__content__text">
+                        This is a sample status to preview the UI styling.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Button Examples -->
+        <div class="button-examples" style="padding: 20px;">
+            <button class="button">Primary Button</button>
+            <button class="button button--secondary">Secondary Button</button>
+            <button class="button button--destructive">Destructive Button</button>
+        </div>
+        
+        <!-- Form Elements -->
+        <div class="simple_form" style="padding: 20px;">
+            <div class="input">
+                <label>Text Input</label>
+                <input type="text" class="string" placeholder="Enter text...">
+            </div>
+            
+            <div class="input">
+                <label>Textarea</label>
+                <textarea class="text" rows="3" placeholder="Enter longer text..."></textarea>
+            </div>
+        </div>
+        
+        <!-- TroupeX Branding Test -->
+        <div class="troupe-branding-test" style="padding: 20px; background: var(--troupe-primary, #1976d2);">
+            <h2 style="color: white;">TroupeX Branding Colors</h2>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div style="width: 50px; height: 50px; background: var(--troupe-primary, #1976d2);"></div>
+                <div style="width: 50px; height: 50px; background: var(--troupe-secondary, #dc004e);"></div>
+                <div style="width: 50px; height: 50px; background: var(--troupe-accent, #f50057);"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>
