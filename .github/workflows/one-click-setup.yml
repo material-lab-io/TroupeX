@@ -1,0 +1,236 @@
+name: One-Click Droplet Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      droplet_ip:
+        description: 'Your DigitalOcean Droplet IP'
+        required: true
+        type: string
+      root_password:
+        description: 'Temporary root password (will setup SSH key auth)'
+        required: true
+        type: string
+
+jobs:
+  setup-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Generate SSH Keys
+      id: ssh-keys
+      run: |
+        # Generate SSH key for GitHub Actions
+        ssh-keygen -t ed25519 -C "github-actions@troupex" -f github-actions-key -N ""
+        
+        # Store keys for later use
+        echo "::add-mask::$(cat github-actions-key)"
+        echo "private_key<<EOF" >> $GITHUB_OUTPUT
+        cat github-actions-key >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        echo "public_key=$(cat github-actions-key.pub)" >> $GITHUB_OUTPUT
+
+    - name: Setup Droplet
+      env:
+        DROPLET_IP: ${{ github.event.inputs.droplet_ip }}
+        ROOT_PASS: ${{ github.event.inputs.root_password }}
+        PUBLIC_KEY: ${{ steps.ssh-keys.outputs.public_key }}
+      run: |
+        # Install sshpass
+        sudo apt-get update && sudo apt-get install -y sshpass
+        
+        # Create comprehensive setup script
+        cat > setup-droplet-complete.sh << 'SCRIPT'
+        #!/bin/bash
+        set -euo pipefail
+        
+        echo "🚀 Starting automated TroupeX setup..."
+        
+        # Update system
+        apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+        
+        # Install required packages
+        DEBIAN_FRONTEND=noninteractive apt-get install -y \
+          curl git vim htop ufw fail2ban \
+          software-properties-common apt-transport-https \
+          ca-certificates gnupg lsb-release \
+          postgresql-client redis-tools nginx certbot \
+          python3-certbot-nginx unattended-upgrades
+        
+        # Install Docker
+        curl -fsSL https://get.docker.com | bash
+        
+        # Create deploy user with Docker access
+        useradd -m -s /bin/bash deploy || true
+        usermod -aG sudo,docker deploy
+        echo "deploy ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/deploy
+        
+        # Setup SSH for deploy user
+        mkdir -p /home/deploy/.ssh
+        echo "$PUBLIC_KEY" > /home/deploy/.ssh/authorized_keys
+        chmod 700 /home/deploy/.ssh
+        chmod 600 /home/deploy/.ssh/authorized_keys
+        chown -R deploy:deploy /home/deploy/.ssh
+        
+        # Also add to root for now
+        mkdir -p /root/.ssh
+        echo "$PUBLIC_KEY" >> /root/.ssh/authorized_keys
+        
+        # Setup application
+        mkdir -p /home/deploy/troupex
+        cd /home/deploy/troupex
+        git clone https://github.com/material-lab-io/TroupeX.git . || git pull
+        mkdir -p mastodon/public/{system,assets,packs} backups logs scripts
+        chown -R deploy:deploy /home/deploy/troupex
+        
+        # Configure firewall
+        ufw --force enable
+        ufw allow 22/tcp
+        ufw allow 80/tcp  
+        ufw allow 443/tcp
+        ufw allow 3000/tcp
+        
+        # Configure swap
+        if ! swapon --show | grep -q swap; then
+          fallocate -l 4G /swapfile
+          chmod 600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          echo '/swapfile none swap sw 0 0' >> /etc/fstab
+        fi
+        
+        # Docker networks
+        docker network create troupex_external || true
+        docker network create troupex_internal || true
+        
+        # Configure automatic updates
+        dpkg-reconfigure -plow unattended-upgrades
+        
+        echo "✅ Setup complete!"
+        SCRIPT
+        
+        # Copy and run setup script on droplet
+        sshpass -p "$ROOT_PASS" ssh -o StrictHostKeyChecking=no root@$DROPLET_IP 'bash -s' < setup-droplet-complete.sh
+
+    - name: Get Known Hosts
+      id: known-hosts
+      env:
+        DROPLET_IP: ${{ github.event.inputs.droplet_ip }}
+      run: |
+        sleep 5  # Wait for SSH to be ready
+        known_hosts=$(ssh-keyscan -H $DROPLET_IP 2>/dev/null)
+        echo "known_hosts<<EOF" >> $GITHUB_OUTPUT
+        echo "$known_hosts" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Generate Production Environment
+      id: prod-env
+      env:
+        DROPLET_IP: ${{ github.event.inputs.droplet_ip }}
+      run: |
+        # Generate secure production environment
+        cat > .env.production << EOF
+        # TroupeX Production Environment
+        LOCAL_DOMAIN=$DROPLET_IP
+        WEB_DOMAIN=$DROPLET_IP
+        
+        # Database
+        DB_HOST=db
+        DB_PORT=5432
+        DB_NAME=mastodon_production
+        DB_USER=mastodon
+        DB_PASS=$(openssl rand -hex 32)
+        
+        # Redis
+        REDIS_HOST=redis
+        REDIS_PORT=6379
+        
+        # Security Keys
+        SECRET_KEY_BASE=$(openssl rand -hex 64)
+        OTP_SECRET=$(openssl rand -hex 64)
+        
+        # Email (configure later)
+        SMTP_SERVER=localhost
+        SMTP_PORT=25
+        SMTP_FROM_ADDRESS=noreply@$DROPLET_IP
+        
+        # Rails
+        RAILS_ENV=production
+        NODE_ENV=production
+        RAILS_LOG_TO_STDOUT=true
+        
+        # Features
+        S3_ENABLED=false
+        SINGLE_USER_MODE=false
+        AUTHORIZED_FETCH=true
+        SHOWCASE_ENABLED=true
+        MESSAGING_ENABLED=true
+        
+        # Performance
+        SIDEKIQ_CONCURRENCY=25
+        DB_POOL=25
+        WEB_CONCURRENCY=2
+        MAX_THREADS=5
+        
+        # Network
+        BIND=0.0.0.0
+        PORT=3000
+        EOF
+        
+        # Encode for secret
+        encoded=$(base64 -w 0 .env.production)
+        echo "::add-mask::$encoded"
+        echo "production_env=$encoded" >> $GITHUB_OUTPUT
+
+    - name: Display Setup Information
+      env:
+        DROPLET_IP: ${{ github.event.inputs.droplet_ip }}
+      run: |
+        echo "=========================================="
+        echo "✅ DROPLET SETUP COMPLETE!"
+        echo "=========================================="
+        echo ""
+        echo "📋 Add these GitHub Secrets:"
+        echo ""
+        echo "1. DROPLET_IP:"
+        echo "   $DROPLET_IP"
+        echo ""
+        echo "2. DROPLET_USER:"
+        echo "   deploy"
+        echo ""
+        echo "3. SSH_PRIVATE_KEY:"
+        echo "   Copy from below (including BEGIN/END lines)"
+        echo ""
+        echo "4. KNOWN_HOSTS:"
+        echo "   Copy from below"
+        echo ""
+        echo "5. PRODUCTION_ENV:"
+        echo "   Copy from below"
+        echo ""
+        echo "6. SITE_URL:"
+        echo "   http://$DROPLET_IP:3000"
+        echo ""
+        echo "=========================================="
+        echo "SSH_PRIVATE_KEY:"
+        echo "=========================================="
+        cat github-actions-key
+        echo ""
+        echo "=========================================="
+        echo "KNOWN_HOSTS:"
+        echo "=========================================="
+        echo "${{ steps.known-hosts.outputs.known_hosts }}"
+        echo ""
+        echo "=========================================="
+        echo "PRODUCTION_ENV:"
+        echo "=========================================="
+        echo "${{ steps.prod-env.outputs.production_env }}"
+        echo ""
+        echo "=========================================="
+        echo ""
+        echo "After adding these secrets, run the"
+        echo "'Deploy to DigitalOcean' workflow!"
+        echo "=========================================="
