@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_05_110215) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_25_042715) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -191,17 +191,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_05_110215) do
     t.boolean "hide_collections"
     t.integer "avatar_storage_schema_version"
     t.integer "header_storage_schema_version"
-    t.integer "suspension_origin"
     t.datetime "sensitized_at", precision: nil
+    t.integer "suspension_origin"
     t.boolean "trendable"
     t.datetime "reviewed_at", precision: nil
     t.datetime "requested_review_at", precision: nil
     t.boolean "indexable", default: false, null: false
     t.string "attribution_domains", default: [], array: true
+    t.string "persona_type"
+    t.jsonb "professional_info", default: {}
+    t.string "availability_status", default: "available"
+    t.boolean "industry_verified", default: false
+    t.datetime "verified_at"
+    t.string "verification_type"
+    t.string "primary_location"
+    t.string "secondary_locations", default: [], array: true
+    t.integer "years_of_experience"
+    t.integer "projects_count", default: 0
+    t.string "budget_range"
+    t.string "professional_skills", default: [], array: true
+    t.string "spoken_languages", default: [], array: true
+    t.string "showreel_url"
+    t.jsonb "portfolio_urls", default: {}
+    t.jsonb "representation_info", default: {}
     t.index "(((setweight(to_tsvector('simple'::regconfig, (display_name)::text), 'A'::\"char\") || setweight(to_tsvector('simple'::regconfig, (username)::text), 'B'::\"char\")) || setweight(to_tsvector('simple'::regconfig, (COALESCE(domain, ''::character varying))::text), 'C'::\"char\")))", name: "search_index", using: :gin
     t.index "lower((username)::text), COALESCE(lower((domain)::text), ''::text)", name: "index_accounts_on_username_and_domain_lower", unique: true
+    t.index ["availability_status"], name: "index_accounts_on_availability_status"
     t.index ["domain", "id"], name: "index_accounts_on_domain_and_id"
+    t.index ["industry_verified"], name: "index_accounts_on_industry_verified"
     t.index ["moved_to_account_id"], name: "index_accounts_on_moved_to_account_id", where: "(moved_to_account_id IS NOT NULL)"
+    t.index ["persona_type"], name: "index_accounts_on_persona_type"
+    t.index ["primary_location"], name: "index_accounts_on_primary_location"
+    t.index ["professional_info"], name: "index_accounts_on_professional_info", using: :gin
+    t.index ["professional_skills"], name: "index_accounts_on_professional_skills", using: :gin
+    t.index ["spoken_languages"], name: "index_accounts_on_spoken_languages", using: :gin
     t.index ["uri"], name: "index_accounts_on_uri"
     t.index ["url"], name: "index_accounts_on_url", opclass: :text_pattern_ops, where: "(url IS NOT NULL)"
   end
@@ -604,12 +627,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_05_110215) do
   end
 
   create_table "ip_blocks", force: :cascade do |t|
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.datetime "expires_at", precision: nil
     t.inet "ip", default: "0.0.0.0", null: false
     t.integer "severity", default: 0, null: false
+    t.datetime "expires_at", precision: nil
     t.text "comment", default: "", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["ip"], name: "index_ip_blocks_on_ip", unique: true
   end
 
@@ -903,6 +926,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_05_110215) do
     t.bigint "preview_card_id", null: false
     t.bigint "status_id", null: false
     t.string "url"
+  end
+
+  create_table "professional_credits", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "project_name", null: false
+    t.string "role_played"
+    t.string "credit_type"
+    t.string "production_house"
+    t.string "director_name"
+    t.integer "release_year"
+    t.string "project_scale"
+    t.string "streaming_platform"
+    t.text "description"
+    t.string "imdb_link"
+    t.string "media_link"
+    t.boolean "featured", default: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "featured"], name: "index_professional_credits_on_account_id_and_featured"
+    t.index ["account_id", "position"], name: "index_professional_credits_on_account_id_and_position"
+    t.index ["account_id"], name: "index_professional_credits_on_account_id"
+    t.index ["credit_type"], name: "index_professional_credits_on_credit_type"
+    t.index ["featured"], name: "index_professional_credits_on_featured"
+    t.index ["release_year"], name: "index_professional_credits_on_release_year"
   end
 
   create_table "quotes", id: :bigint, default: -> { "timestamp_id('quotes'::text)" }, force: :cascade do |t|
@@ -1416,6 +1464,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_05_110215) do
   add_foreign_key "polls", "statuses", on_delete: :cascade
   add_foreign_key "preview_card_trends", "preview_cards", on_delete: :cascade
   add_foreign_key "preview_cards", "accounts", column: "author_account_id", on_delete: :nullify
+  add_foreign_key "professional_credits", "accounts"
   add_foreign_key "quotes", "accounts", column: "quoted_account_id", on_delete: :nullify
   add_foreign_key "quotes", "accounts", on_delete: :cascade
   add_foreign_key "quotes", "statuses", column: "quoted_status_id", on_delete: :nullify

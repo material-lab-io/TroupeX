@@ -152,25 +152,7 @@ class HomeTimeline extends PureComponent {
 
     return (
       <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
-        <ColumnHeader
-          icon='home'
-          iconComponent={matchesBreakpoint ? SymbolLogo : HomeIcon}
-          active={hasUnread}
-          title={(
-            <span className='troupex-title'>
-              Troupex<span className='troupex-super'>x</span>
-            </span>
-          )}
-          onPin={this.handlePin}
-          onMove={this.handleMove}
-          onClick={this.handleHeaderClick}
-          pinned={pinned}
-          multiColumn={multiColumn}
-          extraButton={announcementsButton}
-          appendContent={hasAnnouncements && showAnnouncements && <AnnouncementsContainer />}
-        >
-          <ColumnSettings />
-        </ColumnHeader>
+        {hasAnnouncements && showAnnouncements && <AnnouncementsContainer />}
 
         <div className='home-timeline-search'>
           <Search singleColumn={!multiColumn} />

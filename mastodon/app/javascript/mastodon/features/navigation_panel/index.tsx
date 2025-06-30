@@ -46,6 +46,7 @@ import { ListPanel } from './components/list_panel';
 import { MoreLink } from './components/more_link';
 import { SignInBanner } from './components/sign_in_banner';
 import { Trends } from './components/trends';
+import { NavigationPanelProfile } from '../ui/components/navigation_panel_profile';
 
 const messages = defineMessages({
   home: { id: 'tabs_bar.home', defaultMessage: 'Home' },
@@ -164,17 +165,6 @@ const FollowRequestsLink: React.FC = () => {
   );
 };
 
-const ProfileCard: React.FC = () => {
-  if (!me) {
-    return null;
-  }
-
-  return (
-    <div className='navigation-bar'>
-      <Account id={me} minimal size={36} />
-    </div>
-  );
-};
 
 const isFirehoseActive = (
   match: unknown,
@@ -219,7 +209,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
       {showSearch && <Search singleColumn />}
 
-      {!multiColumn && <ProfileCard />}
+      {!multiColumn && <NavigationPanelProfile />}
 
       {banner && <div className='navigation-panel__banner'>{banner}</div>}
 

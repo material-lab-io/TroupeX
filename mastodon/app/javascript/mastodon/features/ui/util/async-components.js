@@ -186,6 +186,10 @@ export function Search () {
   return import('../../search');
 }
 
+export function Messages () {
+  return import('../../messages');
+}
+
 export function FilterModal () {
   return import('../components/filter_modal');
 }

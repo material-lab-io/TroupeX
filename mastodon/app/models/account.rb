@@ -5,52 +5,68 @@
 # Table name: accounts
 #
 #  id                            :bigint(8)        not null, primary key
-#  username                      :string           default(""), not null
-#  domain                        :string
-#  private_key                   :text
-#  public_key                    :text             default(""), not null
-#  created_at                    :datetime         not null
-#  updated_at                    :datetime         not null
-#  note                          :text             default(""), not null
-#  display_name                  :string           default(""), not null
-#  uri                           :string           default(""), not null
-#  url                           :string
-#  avatar_file_name              :string
+#  actor_type                    :string
+#  also_known_as                 :string           is an Array
+#  attribution_domains           :string           default([]), is an Array
+#  availability_status           :string           default("available")
 #  avatar_content_type           :string
+#  avatar_file_name              :string
 #  avatar_file_size              :integer
-#  avatar_updated_at             :datetime
-#  header_file_name              :string
-#  header_content_type           :string
-#  header_file_size              :integer
-#  header_updated_at             :datetime
 #  avatar_remote_url             :string
-#  locked                        :boolean          default(FALSE), not null
-#  header_remote_url             :string           default(""), not null
-#  last_webfingered_at           :datetime
-#  inbox_url                     :string           default(""), not null
-#  outbox_url                    :string           default(""), not null
-#  shared_inbox_url              :string           default(""), not null
-#  followers_url                 :string           default(""), not null
-#  protocol                      :integer          default("ostatus"), not null
-#  memorial                      :boolean          default(FALSE), not null
-#  moved_to_account_id           :bigint(8)
+#  avatar_storage_schema_version :integer
+#  avatar_updated_at             :datetime
+#  budget_range                  :string
+#  discoverable                  :boolean
+#  display_name                  :string           default(""), not null
+#  domain                        :string
 #  featured_collection_url       :string
 #  fields                        :jsonb
-#  actor_type                    :string
-#  discoverable                  :boolean
-#  also_known_as                 :string           is an Array
-#  silenced_at                   :datetime
-#  suspended_at                  :datetime
-#  hide_collections              :boolean
-#  avatar_storage_schema_version :integer
+#  followers_url                 :string           default(""), not null
+#  header_content_type           :string
+#  header_file_name              :string
+#  header_file_size              :integer
+#  header_remote_url             :string           default(""), not null
 #  header_storage_schema_version :integer
-#  suspension_origin             :integer
-#  sensitized_at                 :datetime
-#  trendable                     :boolean
-#  reviewed_at                   :datetime
-#  requested_review_at           :datetime
+#  header_updated_at             :datetime
+#  hide_collections              :boolean
+#  inbox_url                     :string           default(""), not null
 #  indexable                     :boolean          default(FALSE), not null
-#  attribution_domains           :string           default([]), is an Array
+#  industry_verified             :boolean          default(FALSE)
+#  last_webfingered_at           :datetime
+#  locked                        :boolean          default(FALSE), not null
+#  memorial                      :boolean          default(FALSE), not null
+#  note                          :text             default(""), not null
+#  outbox_url                    :string           default(""), not null
+#  persona_type                  :string
+#  portfolio_urls                :jsonb
+#  primary_location              :string
+#  private_key                   :text
+#  professional_info             :jsonb
+#  professional_skills           :string           default([]), is an Array
+#  projects_count                :integer          default(0)
+#  protocol                      :integer          default("ostatus"), not null
+#  public_key                    :text             default(""), not null
+#  representation_info           :jsonb
+#  requested_review_at           :datetime
+#  reviewed_at                   :datetime
+#  secondary_locations           :string           default([]), is an Array
+#  sensitized_at                 :datetime
+#  shared_inbox_url              :string           default(""), not null
+#  showreel_url                  :string
+#  silenced_at                   :datetime
+#  spoken_languages              :string           default([]), is an Array
+#  suspended_at                  :datetime
+#  suspension_origin             :integer
+#  trendable                     :boolean
+#  uri                           :string           default(""), not null
+#  url                           :string
+#  username                      :string           default(""), not null
+#  verification_type             :string
+#  verified_at                   :datetime
+#  years_of_experience           :integer
+#  created_at                    :datetime         not null
+#  updated_at                    :datetime         not null
+#  moved_to_account_id           :bigint(8)
 #
 
 class Account < ApplicationRecord

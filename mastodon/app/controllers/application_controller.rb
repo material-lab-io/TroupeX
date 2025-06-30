@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
   include DatabaseHelper
   include AuthorizedFetchHelper
   include SelfDestructHelper
+  include RegistrationHelper
 
   helper_method :current_account
   helper_method :current_session
@@ -23,6 +24,7 @@ class ApplicationController < ActionController::Base
   helper_method :sso_account_settings
   helper_method :limited_federation_mode?
   helper_method :skip_csrf_meta_tags?
+  helper_method :registrations_open?
 
   rescue_from ActionController::ParameterMissing, Paperclip::AdapterRegistry::NoHandlerError, with: :bad_request
   rescue_from Mastodon::NotPermittedError, with: :forbidden
