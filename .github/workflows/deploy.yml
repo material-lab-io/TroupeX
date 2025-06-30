@@ -42,13 +42,26 @@ jobs:
         DROPLET_IP: ${{ secrets.DROPLET_IP }}
         DROPLET_USER: ${{ secrets.DROPLET_USER }}
       run: |
+        # Ensure directory exists and pull latest code
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "
+          mkdir -p /home/${DROPLET_USER}/troupex/mastodon
+          cd /home/${DROPLET_USER}/troupex
+          if [ ! -d .git ]; then
+            git clone https://github.com/material-lab-io/TroupeX.git .
+          else
+            git pull origin main
+          fi
+          mkdir -p mastodon/public/{system,assets,packs}
+          mkdir -p backups logs scripts
+        "
+        
         # Copy necessary files to droplet
         scp -o StrictHostKeyChecking=no .env.production ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/mastodon/.env.production
         scp -o StrictHostKeyChecking=no docker-compose.production.yml ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
-        scp -o StrictHostKeyChecking=no scripts/deploy.sh ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
+        scp -o StrictHostKeyChecking=no scripts/deploy.sh ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/scripts/
         
         # Execute deployment script
-        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "cd /home/${DROPLET_USER}/troupex && chmod +x deploy.sh && ./deploy.sh"
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "cd /home/${DROPLET_USER}/troupex && chmod +x scripts/deploy.sh && ./scripts/deploy.sh"
 
     - name: Health check
       env:
@@ -69,7 +82,7 @@ jobs:
         fi
 
     - name: Notify deployment status
-      if: always()
+      if: always() && secrets.SLACK_WEBHOOK != ''
       uses: 8398a7/action-slack@v3
       with:
         status: ${{ job.status }}
@@ -77,6 +90,5 @@ jobs:
           Deployment to ${{ github.event.inputs.environment || 'production' }} ${{ job.status }}
           Commit: ${{ github.sha }}
           Author: ${{ github.actor }}
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
