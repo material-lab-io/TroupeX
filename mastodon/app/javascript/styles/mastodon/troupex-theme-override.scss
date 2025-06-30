@@ -1,0 +1,77 @@
+// Force light theme for main content
+:root,
+html,
+body {
+  // Override CSS variables
+  --background-color: #f5f5f5 !important;
+  --background-color-tint: #f5f5f5 !important;
+  --primary-text-color: #000000 !important;
+  --darker-text-color: #000000 !important;
+  --dark-text-color: #333333 !important;
+  --secondary-text-color: #666666 !important;
+  --highlight-text-color: #000000 !important;
+  --action-button-color: #0a66c2 !important;
+  
+  // Status specific
+  --status-background: #ffffff !important;
+  --status-text-color: #000000 !important;
+}
+
+// Force all statuses to have white background - AGGRESSIVE OVERRIDE
+.status,
+.status.status-public,
+.status.status-unlisted,
+.status.status-private,
+.status.status-direct,
+article.status,
+[class*="status"] {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  
+  * {
+    color: inherit !important;
+  }
+  
+  .status__info,
+  .status__content,
+  .status__action-bar {
+    background: transparent !important;
+  }
+  
+  .status__content {
+    color: #000000 !important;
+    
+    p, span, div {
+      color: #000000 !important;
+    }
+  }
+  
+  .display-name__html,
+  strong {
+    color: #000000 !important;
+  }
+  
+  // Force icon colors
+  svg {
+    fill: #666666 !important;
+  }
+  
+  .icon-button.active svg {
+    fill: #0a66c2 !important;
+  }
+}
+
+// Remove any filters or inverts that might make things dark
+*, *::before, *::after {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+// Main content area
+.columns-area__panels__main,
+.column,
+.scrollable {
+  background: #f5f5f5 !important;
+  background-color: #f5f5f5 !important;
+}
