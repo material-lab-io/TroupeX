@@ -1,0 +1,26 @@
+-# Top navigation bar mount point
+#troupex-navigation-mount
+
+-# Bottom navigation bar mount point  
+#navigation-bar-mount
+
+:javascript
+  // Mount React navigation components when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if React and components are available
+    if (window.TroupeXNavigation && window.NavigationBar && window.ReactDOM) {
+      // Mount TroupeX Navigation
+      const topNavMount = document.getElementById('troupex-navigation-mount');
+      if (topNavMount) {
+        const TroupeXNav = React.createElement(window.TroupeXNavigation);
+        ReactDOM.render(TroupeXNav, topNavMount);
+      }
+      
+      // Mount Bottom Navigation Bar
+      const bottomNavMount = document.getElementById('navigation-bar-mount');
+      if (bottomNavMount) {
+        const BottomNav = React.createElement(window.NavigationBar);
+        ReactDOM.render(BottomNav, bottomNavMount);
+      }
+    }
+  });
