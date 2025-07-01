@@ -38,8 +38,34 @@ jobs:
       web-image: ${{ steps.image.outputs.web-image }}
       streaming-image: ${{ steps.image.outputs.streaming-image }}
       tag: ${{ steps.image.outputs.tag }}
+      build-streaming: ${{ steps.changes.outputs.streaming }}
     
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check for streaming changes
+      id: changes
+      run: |
+        # Check if streaming files have changed
+        # For push events, compare with the before SHA
+        if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }}..HEAD || echo "")
+        else
+          # For manual dispatch or first commit, check against previous commit
+          CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD 2>/dev/null || git ls-tree -r --name-only HEAD)
+        fi
+        
+        if echo "$CHANGED_FILES" | grep -q "^mastodon/streaming/"; then
+          echo "streaming=true" >> $GITHUB_OUTPUT
+          echo "Streaming files changed - will build new image"
+        else
+          echo "streaming=false" >> $GITHUB_OUTPUT
+          echo "No streaming changes - will use existing image"
+        fi
+    
     - name: Generate image tags
       id: image
       run: |
@@ -49,7 +75,14 @@ jobs:
         
         OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
         echo "web-image=${{ env.REGISTRY }}/${OWNER}/troupex-web:${TAG}" >> $GITHUB_OUTPUT
-        echo "streaming-image=${{ env.REGISTRY }}/${OWNER}/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
+        
+        # For streaming, use new tag if changed, otherwise use latest
+        if [ "${{ steps.changes.outputs.streaming }}" = "true" ]; then
+          echo "streaming-image=${{ env.REGISTRY }}/${OWNER}/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
+        else
+          echo "streaming-image=${{ env.REGISTRY }}/${OWNER}/troupex-streaming:latest" >> $GITHUB_OUTPUT
+        fi
+        
         echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
   build-web:
@@ -91,6 +124,7 @@ jobs:
 
   build-streaming:
     needs: prepare
+    if: needs.prepare.outputs.build-streaming == 'true'
     runs-on: [self-hosted, linux]
     permissions:
       contents: read
@@ -125,6 +159,7 @@ jobs:
 
   deploy:
     needs: [prepare, build-web, build-streaming]
+    if: always() && needs.prepare.result == 'success' && needs.build-web.result == 'success' && (needs.build-streaming.result == 'success' || needs.build-streaming.result == 'skipped')
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'production' }}
     
@@ -242,7 +277,14 @@ jobs:
         # Pull latest images
         echo "Pulling latest images..."
         docker pull ${{ needs.prepare.outputs.web-image }}
-        docker pull ${{ needs.prepare.outputs.streaming-image }}
+        
+        # Only pull streaming if it's a new build
+        if [[ "${{ needs.prepare.outputs.streaming-image }}" != *":latest" ]]; then
+          echo "Pulling new streaming image..."
+          docker pull ${{ needs.prepare.outputs.streaming-image }}
+        else
+          echo "Using existing streaming:latest image"
+        fi
         
         # Stop services before migration to avoid port conflicts
         echo "Stopping services for migration..."
