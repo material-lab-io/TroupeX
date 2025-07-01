@@ -113,6 +113,7 @@ jobs:
         echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" | base64 -d > deployment-package/tunnel-creds.json
         
         # Copy deployment files
+        cp docker-compose.yml deployment-package/
         cp docker-compose.production.yml deployment-package/
         cp -r scripts deployment-package/
         
@@ -163,34 +164,24 @@ jobs:
       env:
         DROPLET_IP: ${{ secrets.DROPLET_IP }}
         DROPLET_USER: ${{ secrets.DROPLET_USER }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        # First, upload secrets and configs to temp location
-        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "mkdir -p /tmp/deployment-secrets"
-        scp deployment-package/.env.production ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
-        scp deployment-package/tunnel-config.yml ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
-        scp deployment-package/tunnel-creds.json ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
+        # First, upload all deployment files to temp location
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "mkdir -p /tmp/deployment-package"
+        scp -r deployment-package/* ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-package/
         
         # Execute deployment
         ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << ENDSSH
           cd /home/\${USER}
           
-          # Clone or update repository
-          if [ -d troupex/.git ]; then
-            echo "Updating existing repository..."
-            cd troupex
-            git fetch origin
-            git reset --hard origin/main
-          else
-            # Remove existing directory if it exists but is not a git repo
-            if [ -d troupex ]; then
-              echo "Removing non-git troupex directory..."
-              rm -rf troupex
-            fi
-            echo "Cloning repository..."
-            git clone https://${GITHUB_TOKEN}@github.com/material-lab-io/TroupeX.git troupex
-            cd troupex
+          # Ensure clean directory
+          if [ -d troupex ]; then
+            echo "Removing existing troupex directory..."
+            rm -rf troupex
           fi
+          
+          echo "Creating deployment directory..."
+          mkdir -p troupex
+          cd troupex
           
           # Ensure directory structure exists
           mkdir -p mastodon/public/{system,assets,packs}
@@ -207,13 +198,20 @@ jobs:
             docker compose exec -T db pg_dump -U mastodon mastodon_production 2>/dev/null | gzip > \$backup_dir/database.sql.gz || true
           fi
           
-          # Copy secrets from temp location
-          cp /tmp/deployment-secrets/.env.production mastodon/.env.production
+          # Copy all deployment files from temp location
+          cp /tmp/deployment-package/.env.production mastodon/.env.production
+          cp /tmp/deployment-package/docker-compose.yml .
+          cp /tmp/deployment-package/docker-compose.production.yml .
+          cp -r /tmp/deployment-package/scripts .
+          
+          # Setup Cloudflare tunnel configs
           mkdir -p ~/.cloudflared
-          cp /tmp/deployment-secrets/tunnel-config.yml ~/.cloudflared/config.yml
-          cp /tmp/deployment-secrets/tunnel-creds.json ~/.cloudflared/
+          cp /tmp/deployment-package/tunnel-config.yml ~/.cloudflared/config.yml
+          cp /tmp/deployment-package/tunnel-creds.json ~/.cloudflared/
           chmod 600 ~/.cloudflared/*
-          rm -rf /tmp/deployment-secrets
+          
+          # Clean up temp files
+          rm -rf /tmp/deployment-package
           
           # Pull latest Docker images
           echo "Pulling latest Docker images..."
