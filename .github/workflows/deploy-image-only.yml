@@ -275,6 +275,11 @@ jobs:
           fi
         ENDSSH
         
+        # Login to GitHub Container Registry on the server
+        ssh ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH'
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        ENDSSH
+        
         # Execute deployment
         ssh ${DROPLET_USER}@${DROPLET_IP} "cd /home/${DROPLET_USER}/troupex && bash deploy.sh"
 
