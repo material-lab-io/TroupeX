@@ -35,10 +35,15 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y s3cmd
         
-        # Install AWS CLI as backup option
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        sudo ./aws/install
+        # AWS CLI might already be installed on GitHub runners
+        # Check if it exists and skip installation if present
+        if ! command -v aws &> /dev/null; then
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+        else
+          echo "AWS CLI already installed: $(aws --version)"
+        fi
 
     - name: Configure s3cmd
       env:
