@@ -163,6 +163,7 @@ jobs:
       env:
         DROPLET_IP: ${{ secrets.DROPLET_IP }}
         DROPLET_USER: ${{ secrets.DROPLET_USER }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # First, upload secrets and configs to temp location
         ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "mkdir -p /tmp/deployment-secrets"
@@ -171,8 +172,8 @@ jobs:
         scp deployment-package/tunnel-creds.json ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
         
         # Execute deployment
-        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH'
-          cd /home/${USER}
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << ENDSSH
+          cd /home/\${USER}
           
           # Clone or update repository
           if [ -d troupex/.git ]; then
@@ -182,7 +183,7 @@ jobs:
             git reset --hard origin/main
           else
             echo "Cloning repository..."
-            git clone https://github.com/material-lab-io/TroupeX.git troupex
+            git clone https://${GITHUB_TOKEN}@github.com/material-lab-io/TroupeX.git troupex
             cd troupex
           fi
           
@@ -193,12 +194,12 @@ jobs:
           # Backup current deployment if exists
           if [ -f mastodon/.env.production ] && docker compose ps 2>/dev/null | grep -q "running"; then
             echo "Creating backup..."
-            backup_dir="backups/backup_$(date +%Y%m%d_%H%M%S)"
-            mkdir -p $backup_dir
-            cp mastodon/.env.production $backup_dir/
+            backup_dir="backups/backup_\$(date +%Y%m%d_%H%M%S)"
+            mkdir -p \$backup_dir
+            cp mastodon/.env.production \$backup_dir/
             
             # Backup database if running
-            docker compose exec -T db pg_dump -U mastodon mastodon_production 2>/dev/null | gzip > $backup_dir/database.sql.gz || true
+            docker compose exec -T db pg_dump -U mastodon mastodon_production 2>/dev/null | gzip > \$backup_dir/database.sql.gz || true
           fi
           
           # Copy secrets from temp location
@@ -265,7 +266,7 @@ jobs:
           sleep 10
           
           # Log deployment
-          echo "$(date): Deployed ${GITHUB_SHA:-unknown} by ${GITHUB_ACTOR:-unknown}" >> deployments.log
+          echo "\$(date): Deployed \${GITHUB_SHA:-unknown} by \${GITHUB_ACTOR:-unknown}" >> deployments.log
         ENDSSH
 
     - name: Verify deployment
