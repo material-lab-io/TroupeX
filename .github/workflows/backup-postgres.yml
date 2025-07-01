@@ -88,17 +88,32 @@ jobs:
         
         # Create backup on the droplet and stream it compressed
         ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH' | gzip -9 > /tmp/${BACKUP_FILENAME}
-          cd /home/${USER}/troupex
+          # Try to find the troupex directory
+          if [ -d "/home/${USER}/troupex" ]; then
+            cd /home/${USER}/troupex
+          elif [ -d "/home/${USER}/TroupeX" ]; then
+            cd /home/${USER}/TroupeX
+          else
+            echo "Error: TroupeX directory not found!" >&2
+            exit 1
+          fi
           
-          # Get the database container name
-          DB_CONTAINER=$(docker compose ps -q db)
+          # Get the database container name (try different naming patterns)
+          DB_CONTAINER=$(docker compose ps -q db 2>/dev/null || docker ps --format "table {{.Names}}" | grep -E "(db|postgres)" | grep -i troupex | head -1)
+          
           if [ -z "$DB_CONTAINER" ]; then
             echo "Error: Database container not found!" >&2
+            echo "Available containers:" >&2
+            docker ps --format "table {{.Names}}" >&2
             exit 1
           fi
           
           # Create the database dump
-          docker compose exec -T db pg_dump -U mastodon -d mastodon_production --no-owner --clean --if-exists
+          if docker compose ps -q db >/dev/null 2>&1; then
+            docker compose exec -T db pg_dump -U mastodon -d mastodon_production --no-owner --clean --if-exists
+          else
+            docker exec -i ${DB_CONTAINER} pg_dump -U mastodon -d mastodon_production --no-owner --clean --if-exists
+          fi
         ENDSSH
         
         # Check if backup was created successfully
