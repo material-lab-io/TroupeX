@@ -1,0 +1,288 @@
+name: Deploy TroupeX (Image-Only)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux]
+    permissions:
+      contents: read
+      packages: write
+    
+    outputs:
+      web-image: ${{ steps.image.outputs.web-image }}
+      streaming-image: ${{ steps.image.outputs.streaming-image }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Generate image tags
+      id: image
+      run: |
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        SHA_SHORT=${GITHUB_SHA::7}
+        TAG="${TIMESTAMP}-${SHA_SHORT}"
+        
+        echo "web-image=${{ env.REGISTRY }}/material-lab-io/troupex-web:${TAG}" >> $GITHUB_OUTPUT
+        echo "streaming-image=${{ env.REGISTRY }}/material-lab-io/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+    - name: Build and push web image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./mastodon
+        file: ./mastodon/Dockerfile
+        push: true
+        tags: |
+          ${{ steps.image.outputs.web-image }}
+          ${{ env.REGISTRY }}/material-lab-io/troupex-web:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+        build-args: |
+          RAILS_ENV=production
+          NODE_ENV=production
+
+    - name: Build and push streaming image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./mastodon
+        file: ./mastodon/streaming/Dockerfile
+        push: true
+        tags: |
+          ${{ steps.image.outputs.streaming-image }}
+          ${{ env.REGISTRY }}/material-lab-io/troupex-streaming:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+    - name: Create deployment files
+      run: |
+        mkdir -p deployment
+        
+        # Create minimal docker-compose for production
+        cat > deployment/docker-compose.yml << 'EOF'
+        version: '3'
+
+        services:
+          db:
+            restart: always
+            image: postgres:14-alpine
+            shm_size: 512mb
+            networks:
+              - internal_network
+            healthcheck:
+              test: ['CMD', 'pg_isready', '-U', 'postgres']
+            volumes:
+              - postgres14:/var/lib/postgresql/data
+            environment:
+              - 'POSTGRES_HOST_AUTH_METHOD=trust'
+
+          redis:
+            restart: always
+            image: redis:7-alpine
+            networks:
+              - internal_network
+            healthcheck:
+              test: ['CMD', 'redis-cli', 'ping']
+            volumes:
+              - redis:/data
+
+          web:
+            image: ${{ needs.build.outputs.web-image }}
+            restart: always
+            env_file: .env.production
+            command: bash -c "rm -f /mastodon/tmp/pids/server.pid && rails db:migrate && rails s -p 3000"
+            networks:
+              - external_network
+              - internal_network
+            ports:
+              - '3000:3000'
+            depends_on:
+              - db
+              - redis
+            volumes:
+              - public-system:/mastodon/public/system
+              - public-assets:/mastodon/public/assets
+              - public-packs:/mastodon/public/packs
+
+          streaming:
+            image: ${{ needs.build.outputs.streaming-image }}
+            restart: always
+            env_file: .env.production
+            command: node ./streaming
+            networks:
+              - external_network
+              - internal_network
+            ports:
+              - '4000:4000'
+            depends_on:
+              - db
+              - redis
+
+          sidekiq:
+            image: ${{ needs.build.outputs.web-image }}
+            restart: always
+            env_file: .env.production
+            command: bundle exec sidekiq
+            depends_on:
+              - db
+              - redis
+            networks:
+              - external_network
+              - internal_network
+            volumes:
+              - public-system:/mastodon/public/system
+              - public-packs:/mastodon/public/packs
+
+        networks:
+          external_network:
+            driver: bridge
+          internal_network:
+            driver: bridge
+            internal: true
+
+        volumes:
+          postgres14:
+          redis:
+          public-system:
+          public-assets:
+          public-packs:
+        EOF
+        
+        # Create deployment script
+        cat > deployment/deploy.sh << 'EOF'
+        #!/bin/bash
+        set -e
+        
+        echo "=== TroupeX Image-Only Deployment ==="
+        echo "Web Image: ${{ needs.build.outputs.web-image }}"
+        echo "Streaming Image: ${{ needs.build.outputs.streaming-image }}"
+        
+        # Ensure we're in the right directory
+        cd /home/${USER}/troupex
+        
+        # Pull latest images
+        echo "Pulling latest images..."
+        docker pull ${{ needs.build.outputs.web-image }}
+        docker pull ${{ needs.build.outputs.streaming-image }}
+        
+        # Run database migrations before updating
+        echo "Running database migrations..."
+        docker compose run --rm web rails db:migrate
+        
+        # Update services with zero downtime
+        echo "Updating services..."
+        docker compose up -d --no-deps --scale web=2 web
+        sleep 30
+        docker compose up -d --no-deps web
+        docker compose up -d --no-deps streaming sidekiq
+        
+        # Clean up old containers
+        echo "Cleaning up..."
+        docker container prune -f
+        
+        # Health check
+        echo "Checking health..."
+        sleep 10
+        docker compose ps
+        
+        echo "Deployment complete!"
+        EOF
+        
+        chmod +x deployment/deploy.sh
+
+    - name: Deploy to server
+      env:
+        DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        DROPLET_USER: ${{ secrets.DROPLET_USER }}
+      run: |
+        # Upload deployment files
+        scp -o StrictHostKeyChecking=no deployment/docker-compose.yml ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
+        scp deployment/deploy.sh ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
+        
+        # Upload env file
+        echo "${{ secrets.PRODUCTION_ENV }}" | base64 -d | ssh ${DROPLET_USER}@${DROPLET_IP} "cat > /home/${DROPLET_USER}/troupex/.env.production"
+        
+        # Setup Cloudflare tunnel
+        ssh ${DROPLET_USER}@${DROPLET_IP} << ENDSSH
+          mkdir -p ~/.cloudflared
+          echo "${{ secrets.CLOUDFLARE_TUNNEL_CONFIG }}" | base64 -d > ~/.cloudflared/config.yml
+          echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" | base64 -d > ~/.cloudflared/tunnel-creds.json
+          chmod 600 ~/.cloudflared/*
+          
+          # Ensure tunnel is running
+          if ! systemctl is-active --quiet cloudflared; then
+            sudo cloudflared service install || true
+            sudo systemctl start cloudflared
+            sudo systemctl enable cloudflared
+          fi
+        ENDSSH
+        
+        # Execute deployment
+        ssh ${DROPLET_USER}@${DROPLET_IP} "cd /home/${DROPLET_USER}/troupex && bash deploy.sh"
+
+    - name: Verify deployment
+      env:
+        SITE_URL: ${{ secrets.SITE_URL }}
+      run: |
+        echo "Waiting for services to stabilize..."
+        sleep 30
+        
+        # Health check
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${SITE_URL}/health || echo "000")
+        if [ "$response" = "200" ]; then
+          echo "✅ Deployment successful! Site is healthy."
+        else
+          echo "❌ Health check failed (HTTP $response)"
+          exit 1
+        fi
+
+    - name: Deployment summary
+      if: always()
+      run: |
+        echo "## Deployment Summary"
+        echo "- **Environment**: ${{ github.event.inputs.environment || 'production' }}"
+        echo "- **Web Image**: ${{ needs.build.outputs.web-image }}"
+        echo "- **Streaming Image**: ${{ needs.build.outputs.streaming-image }}"
+        echo "- **Deployed by**: ${{ github.actor }}"
+        echo "- **Status**: ${{ job.status }}"
