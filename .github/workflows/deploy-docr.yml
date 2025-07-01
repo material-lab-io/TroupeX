@@ -1,11 +1,11 @@
-name: Deploy TroupeX (Parallel Build)
+name: Deploy TroupeX (DigitalOcean Registry)
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'mastodon/**'
-      - '.github/workflows/deploy-image-only.yml'
+      - '.github/workflows/deploy-docr.yml'
       - 'Dockerfile'
       - 'docker-compose*.yml'
   workflow_dispatch:
@@ -24,12 +24,11 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: registry.digitalocean.com
+  IMAGE_NAMESPACE: ${{ secrets.DOCR_NAMESPACE }} # Your DO registry name
 
 permissions:
   contents: read
-  packages: write
   
 jobs:
   prepare:
@@ -47,17 +46,13 @@ jobs:
         SHA_SHORT=${GITHUB_SHA::7}
         TAG="${TIMESTAMP}-${SHA_SHORT}"
         
-        OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-        echo "web-image=${{ env.REGISTRY }}/${OWNER}/troupex-web:${TAG}" >> $GITHUB_OUTPUT
-        echo "streaming-image=${{ env.REGISTRY }}/${OWNER}/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
+        echo "web-image=${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/troupex-web:${TAG}" >> $GITHUB_OUTPUT
+        echo "streaming-image=${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
         echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
   build-web:
     needs: prepare
     runs-on: [self-hosted, linux]
-    permissions:
-      contents: read
-      packages: write
     
     steps:
     - name: Checkout repository
@@ -66,12 +61,13 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
       with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Log in to DigitalOcean Container Registry
+      run: doctl registry login --expiry-seconds 3600
 
     - name: Build and push web image
       uses: docker/build-push-action@v5
@@ -81,7 +77,7 @@ jobs:
         push: true
         tags: |
           ${{ needs.prepare.outputs.web-image }}
-          ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-web:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/troupex-web:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
@@ -92,9 +88,6 @@ jobs:
   build-streaming:
     needs: prepare
     runs-on: [self-hosted, linux]
-    permissions:
-      contents: read
-      packages: write
     
     steps:
     - name: Checkout repository
@@ -103,12 +96,13 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
       with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Log in to DigitalOcean Container Registry
+      run: doctl registry login --expiry-seconds 3600
 
     - name: Build and push streaming image
       uses: docker/build-push-action@v5
@@ -118,7 +112,7 @@ jobs:
         push: true
         tags: |
           ${{ needs.prepare.outputs.streaming-image }}
-          ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-streaming:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/troupex-streaming:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
@@ -232,7 +226,7 @@ jobs:
         #!/bin/bash
         set -e
         
-        echo "=== TroupeX Image-Only Deployment ===="
+        echo "=== TroupeX DOCR Deployment ===="
         echo "Web Image: ${{ needs.prepare.outputs.web-image }}"
         echo "Streaming Image: ${{ needs.prepare.outputs.streaming-image }}"
         
@@ -251,9 +245,6 @@ jobs:
         # Update services
         echo "Updating services..."
         docker compose up -d --no-deps web streaming sidekiq
-        
-        # The zero-downtime scaling doesn't work with port mapping
-        # Just do a quick restart which takes < 10 seconds
         
         # Clean up old containers
         echo "Cleaning up..."
@@ -299,9 +290,21 @@ jobs:
           fi
         ENDSSH
         
-        # Login to GitHub Container Registry on the server
+        # Login to DigitalOcean Container Registry on the server
         ssh ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH'
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          # Install doctl if not present
+          if ! command -v doctl &> /dev/null; then
+            echo "Installing doctl..."
+            cd ~
+            wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+            tar xf doctl-1.104.0-linux-amd64.tar.gz
+            sudo mv doctl /usr/local/bin
+            rm doctl-1.104.0-linux-amd64.tar.gz
+          fi
+          
+          # Login to registry
+          echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | doctl auth init -
+          doctl registry login
         ENDSSH
         
         # Execute deployment
