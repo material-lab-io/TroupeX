@@ -164,56 +164,86 @@ jobs:
         DROPLET_IP: ${{ secrets.DROPLET_IP }}
         DROPLET_USER: ${{ secrets.DROPLET_USER }}
       run: |
-        # Upload deployment package
-        scp -r deployment-package/* ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
+        # First, upload secrets and configs to temp location
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "mkdir -p /tmp/deployment-secrets"
+        scp deployment-package/.env.production ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
+        scp deployment-package/tunnel-config.yml ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
+        scp deployment-package/tunnel-creds.json ${DROPLET_USER}@${DROPLET_IP}:/tmp/deployment-secrets/
         
         # Execute deployment
         ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH'
-          cd /home/${USER}/troupex
+          cd /home/${USER}
           
-          # Move files to correct locations
-          mv .env.production mastodon/
-          mv tunnel-config.yml ~/.cloudflared/config.yml
-          mv tunnel-creds.json ~/.cloudflared/
-          chmod 600 ~/.cloudflared/*
+          # Clone or update repository
+          if [ -d troupex/.git ]; then
+            echo "Updating existing repository..."
+            cd troupex
+            git fetch origin
+            git reset --hard origin/main
+          else
+            echo "Cloning repository..."
+            git clone https://github.com/material-lab-io/TroupeX.git troupex
+            cd troupex
+          fi
           
-          # Backup current deployment
-          if [ -f mastodon/.env.production ]; then
+          # Ensure directory structure exists
+          mkdir -p mastodon/public/{system,assets,packs}
+          mkdir -p backups logs
+          
+          # Backup current deployment if exists
+          if [ -f mastodon/.env.production ] && docker compose ps 2>/dev/null | grep -q "running"; then
+            echo "Creating backup..."
             backup_dir="backups/backup_$(date +%Y%m%d_%H%M%S)"
             mkdir -p $backup_dir
             cp mastodon/.env.production $backup_dir/
             
             # Backup database if running
-            if docker compose ps | grep -q "db.*running"; then
-              docker compose exec -T db pg_dump -U mastodon mastodon_production | gzip > $backup_dir/database.sql.gz
-            fi
+            docker compose exec -T db pg_dump -U mastodon mastodon_production 2>/dev/null | gzip > $backup_dir/database.sql.gz || true
           fi
+          
+          # Copy secrets from temp location
+          cp /tmp/deployment-secrets/.env.production mastodon/.env.production
+          mkdir -p ~/.cloudflared
+          cp /tmp/deployment-secrets/tunnel-config.yml ~/.cloudflared/config.yml
+          cp /tmp/deployment-secrets/tunnel-creds.json ~/.cloudflared/
+          chmod 600 ~/.cloudflared/*
+          rm -rf /tmp/deployment-secrets
+          
+          # Pull latest Docker images
+          echo "Pulling latest Docker images..."
+          docker compose -f docker-compose.yml -f docker-compose.production.yml pull
           
           # Stop current services
+          echo "Stopping current services..."
           docker compose -f docker-compose.yml -f docker-compose.production.yml down || true
           
-          # Pull latest code
-          if [ ! -d .git ]; then
-            git clone https://github.com/material-lab-io/TroupeX.git .
-          else
-            git fetch origin
-            git reset --hard origin/main
-          fi
-          
-          # Start core services
+          # Start database and redis first
+          echo "Starting database services..."
           docker compose -f docker-compose.yml -f docker-compose.production.yml up -d db redis
           
-          # Wait for database
+          # Wait for database to be ready
           echo "Waiting for database..."
-          sleep 15
+          for i in {1..30}; do
+            if docker compose exec -T db pg_isready -U mastodon 2>/dev/null; then
+              echo "Database is ready!"
+              break
+            fi
+            echo "Waiting for database... ($i/30)"
+            sleep 2
+          done
           
           # Run migrations
+          echo "Running database migrations..."
           docker compose -f docker-compose.yml -f docker-compose.production.yml run --rm web rails db:migrate
           
-          # Precompile assets
-          docker compose -f docker-compose.yml -f docker-compose.production.yml run --rm web rails assets:precompile
+          # Precompile assets (skip if they exist and we're just updating code)
+          if [ ! -d "mastodon/public/assets" ] || [ ! -d "mastodon/public/packs" ]; then
+            echo "Precompiling assets..."
+            docker compose -f docker-compose.yml -f docker-compose.production.yml run --rm web rails assets:precompile
+          fi
           
           # Start all services
+          echo "Starting all services..."
           docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
           
           # Setup Cloudflare tunnel
@@ -221,15 +251,21 @@ jobs:
           
           # Stop existing tunnel
           sudo systemctl stop cloudflared 2>/dev/null || true
-          pkill -f cloudflared 2>/dev/null || true
           
-          # Install as systemd service
-          sudo cloudflared service install
+          # Install as systemd service if not already installed
+          if ! systemctl list-unit-files | grep -q cloudflared.service; then
+            sudo cloudflared service install
+          fi
+          
           sudo systemctl start cloudflared
           sudo systemctl enable cloudflared
           
+          # Wait for services to be healthy
+          echo "Waiting for services to become healthy..."
+          sleep 10
+          
           # Log deployment
-          echo "$(date): Deployed $GITHUB_SHA by $GITHUB_ACTOR" >> deployments.log
+          echo "$(date): Deployed ${GITHUB_SHA:-unknown} by ${GITHUB_ACTOR:-unknown}" >> deployments.log
         ENDSSH
 
     - name: Verify deployment
