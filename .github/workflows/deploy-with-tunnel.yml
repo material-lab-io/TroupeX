@@ -26,7 +26,7 @@ env:
 jobs:
   build:
     if: ${{ !inputs.skip_build }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     permissions:
       contents: read
       packages: write
@@ -86,7 +86,7 @@ jobs:
   deploy:
     needs: build
     if: always() && (needs.build.result == 'success' || inputs.skip_build)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     environment: ${{ github.event.inputs.environment || 'production' }}
     
     steps:
@@ -390,7 +390,7 @@ jobs:
   rollback:
     if: failure() && needs.deploy.result == 'failure'
     needs: deploy
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     environment: ${{ github.event.inputs.environment || 'production' }}
     
     steps:
