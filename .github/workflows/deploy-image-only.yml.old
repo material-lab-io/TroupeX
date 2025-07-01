@@ -1,4 +1,4 @@
-name: Deploy TroupeX (Parallel Build)
+name: Deploy TroupeX (Image-Only)
 
 on:
   push:
@@ -32,14 +32,30 @@ permissions:
   packages: write
   
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: [self-hosted, linux]
+    permissions:
+      contents: read
+      packages: write
+    
     outputs:
       web-image: ${{ steps.image.outputs.web-image }}
       streaming-image: ${{ steps.image.outputs.streaming-image }}
-      tag: ${{ steps.image.outputs.tag }}
     
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Generate image tags
       id: image
       run: |
@@ -52,27 +68,6 @@ jobs:
         echo "streaming-image=${{ env.REGISTRY }}/${OWNER}/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
         echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
-  build-web:
-    needs: prepare
-    runs-on: [self-hosted, linux]
-    permissions:
-      contents: read
-      packages: write
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Build and push web image
       uses: docker/build-push-action@v5
       with:
@@ -80,7 +75,7 @@ jobs:
         file: ./mastodon/Dockerfile
         push: true
         tags: |
-          ${{ needs.prepare.outputs.web-image }}
+          ${{ steps.image.outputs.web-image }}
           ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-web:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -89,27 +84,6 @@ jobs:
           RAILS_ENV=production
           NODE_ENV=production
 
-  build-streaming:
-    needs: prepare
-    runs-on: [self-hosted, linux]
-    permissions:
-      contents: read
-      packages: write
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Build and push streaming image
       uses: docker/build-push-action@v5
       with:
@@ -117,14 +91,14 @@ jobs:
         file: ./mastodon/streaming/Dockerfile
         push: true
         tags: |
-          ${{ needs.prepare.outputs.streaming-image }}
+          ${{ steps.image.outputs.streaming-image }}
           ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-streaming:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
 
   deploy:
-    needs: [prepare, build-web, build-streaming]
+    needs: build
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'production' }}
     
@@ -168,7 +142,7 @@ jobs:
               - redis:/data
 
           web:
-            image: ${{ needs.prepare.outputs.web-image }}
+            image: ${{ needs.build.outputs.web-image }}
             restart: always
             env_file: .env.production
             command: bash -c "rm -f /mastodon/tmp/pids/server.pid && rails db:migrate && rails s -p 3000"
@@ -186,7 +160,7 @@ jobs:
               - public-packs:/mastodon/public/packs
 
           streaming:
-            image: ${{ needs.prepare.outputs.streaming-image }}
+            image: ${{ needs.build.outputs.streaming-image }}
             restart: always
             env_file: .env.production
             command: node ./streaming
@@ -200,7 +174,7 @@ jobs:
               - redis
 
           sidekiq:
-            image: ${{ needs.prepare.outputs.web-image }}
+            image: ${{ needs.build.outputs.web-image }}
             restart: always
             env_file: .env.production
             command: bundle exec sidekiq
@@ -234,17 +208,17 @@ jobs:
         #!/bin/bash
         set -e
         
-        echo "=== TroupeX Image-Only Deployment ===="
-        echo "Web Image: ${{ needs.prepare.outputs.web-image }}"
-        echo "Streaming Image: ${{ needs.prepare.outputs.streaming-image }}"
+        echo "=== TroupeX Image-Only Deployment ==="
+        echo "Web Image: ${{ needs.build.outputs.web-image }}"
+        echo "Streaming Image: ${{ needs.build.outputs.streaming-image }}"
         
         # Ensure we're in the right directory
         cd /home/${USER}/troupex
         
         # Pull latest images
         echo "Pulling latest images..."
-        docker pull ${{ needs.prepare.outputs.web-image }}
-        docker pull ${{ needs.prepare.outputs.streaming-image }}
+        docker pull ${{ needs.build.outputs.web-image }}
+        docker pull ${{ needs.build.outputs.streaming-image }}
         
         # Run database migrations before updating
         echo "Running database migrations..."
@@ -330,7 +304,7 @@ jobs:
       run: |
         echo "## Deployment Summary"
         echo "- **Environment**: ${{ github.event.inputs.environment || 'production' }}"
-        echo "- **Web Image**: ${{ needs.prepare.outputs.web-image }}"
-        echo "- **Streaming Image**: ${{ needs.prepare.outputs.streaming-image }}"
+        echo "- **Web Image**: ${{ needs.build.outputs.web-image }}"
+        echo "- **Streaming Image**: ${{ needs.build.outputs.streaming-image }}"
         echo "- **Deployed by**: ${{ github.actor }}"
         echo "- **Status**: ${{ job.status }}"
