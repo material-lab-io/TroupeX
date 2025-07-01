@@ -182,6 +182,11 @@ jobs:
             git fetch origin
             git reset --hard origin/main
           else
+            # Remove existing directory if it exists but is not a git repo
+            if [ -d troupex ]; then
+              echo "Removing non-git troupex directory..."
+              rm -rf troupex
+            fi
             echo "Cloning repository..."
             git clone https://${GITHUB_TOKEN}@github.com/material-lab-io/TroupeX.git troupex
             cd troupex
