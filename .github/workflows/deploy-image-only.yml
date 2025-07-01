@@ -27,6 +27,10 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+permissions:
+  contents: read
+  packages: write
+  
 jobs:
   build:
     runs-on: [self-hosted, linux]
@@ -59,8 +63,9 @@ jobs:
         SHA_SHORT=${GITHUB_SHA::7}
         TAG="${TIMESTAMP}-${SHA_SHORT}"
         
-        echo "web-image=${{ env.REGISTRY }}/material-lab-io/troupex-web:${TAG}" >> $GITHUB_OUTPUT
-        echo "streaming-image=${{ env.REGISTRY }}/material-lab-io/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
+        OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+        echo "web-image=${{ env.REGISTRY }}/${OWNER}/troupex-web:${TAG}" >> $GITHUB_OUTPUT
+        echo "streaming-image=${{ env.REGISTRY }}/${OWNER}/troupex-streaming:${TAG}" >> $GITHUB_OUTPUT
         echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
     - name: Build and push web image
@@ -71,7 +76,7 @@ jobs:
         push: true
         tags: |
           ${{ steps.image.outputs.web-image }}
-          ${{ env.REGISTRY }}/material-lab-io/troupex-web:latest
+          ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-web:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
@@ -87,7 +92,7 @@ jobs:
         push: true
         tags: |
           ${{ steps.image.outputs.streaming-image }}
-          ${{ env.REGISTRY }}/material-lab-io/troupex-streaming:latest
+          ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-streaming:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
