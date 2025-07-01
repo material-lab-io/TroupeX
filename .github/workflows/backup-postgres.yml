@@ -1,0 +1,212 @@
+name: Scheduled PostgreSQL Backup
+
+on:
+  schedule:
+    # Run daily at 3:00 AM IST (21:30 UTC previous day)
+    - cron: '30 21 * * *'
+  workflow_dispatch:
+    inputs:
+      backup_type:
+        description: 'Type of backup'
+        required: true
+        default: 'manual'
+        type: choice
+        options:
+          - manual
+          - daily
+          - weekly
+
+env:
+  DO_SPACES_NAME: troupex-backup
+  DO_SPACES_REGION: blr1
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    name: Backup PostgreSQL to DigitalOcean Spaces
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        # Install s3cmd for DigitalOcean Spaces
+        sudo apt-get update
+        sudo apt-get install -y s3cmd
+        
+        # Install AWS CLI as backup option
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+
+    - name: Configure s3cmd
+      env:
+        DO_SPACES_ACCESS_KEY: ${{ secrets.DO_SPACES_ACCESS_KEY }}
+        DO_SPACES_SECRET_KEY: ${{ secrets.DO_SPACES_SECRET_KEY }}
+      run: |
+        # Create s3cmd configuration
+        cat > ~/.s3cfg << EOF
+        [default]
+        access_key = ${DO_SPACES_ACCESS_KEY}
+        secret_key = ${DO_SPACES_SECRET_KEY}
+        host_base = ${DO_SPACES_REGION}.digitaloceanspaces.com
+        host_bucket = %(bucket)s.${DO_SPACES_REGION}.digitaloceanspaces.com
+        use_https = True
+        EOF
+
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+    - name: Determine backup type
+      id: backup_type
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          BACKUP_TYPE="${{ github.event.inputs.backup_type }}"
+        elif [ "$(date +%u)" = "7" ]; then
+          # Sunday - create weekly backup
+          BACKUP_TYPE="weekly"
+        else
+          BACKUP_TYPE="daily"
+        fi
+        echo "type=${BACKUP_TYPE}" >> $GITHUB_OUTPUT
+        echo "Backup type: ${BACKUP_TYPE}"
+
+    - name: Create PostgreSQL backup
+      env:
+        DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        DROPLET_USER: ${{ secrets.DROPLET_USER }}
+      run: |
+        TIMESTAMP=$(date -u +%Y-%m-%d-%H-%M-%S)
+        BACKUP_TYPE="${{ steps.backup_type.outputs.type }}"
+        BACKUP_FILENAME="mastodon-${BACKUP_TYPE}-${TIMESTAMP}.sql.gz"
+        
+        echo "Creating PostgreSQL backup: ${BACKUP_FILENAME}"
+        
+        # Create backup on the droplet and stream it compressed
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH' | gzip -9 > /tmp/${BACKUP_FILENAME}
+          cd /home/${USER}/troupex
+          
+          # Get the database container name
+          DB_CONTAINER=$(docker compose ps -q db)
+          if [ -z "$DB_CONTAINER" ]; then
+            echo "Error: Database container not found!" >&2
+            exit 1
+          fi
+          
+          # Create the database dump
+          docker compose exec -T db pg_dump -U mastodon -d mastodon_production --no-owner --clean --if-exists
+        ENDSSH
+        
+        # Check if backup was created successfully
+        if [ ! -s "/tmp/${BACKUP_FILENAME}" ]; then
+          echo "Error: Backup file is empty or was not created"
+          exit 1
+        fi
+        
+        # Get backup size
+        BACKUP_SIZE=$(ls -lh /tmp/${BACKUP_FILENAME} | awk '{print $5}')
+        echo "Backup created successfully: ${BACKUP_FILENAME} (${BACKUP_SIZE})"
+        
+        # Store filename for next steps
+        echo "backup_filename=${BACKUP_FILENAME}" >> $GITHUB_ENV
+        echo "backup_size=${BACKUP_SIZE}" >> $GITHUB_ENV
+
+    - name: Upload to DigitalOcean Spaces
+      run: |
+        BACKUP_TYPE="${{ steps.backup_type.outputs.type }}"
+        S3_PATH="s3://${DO_SPACES_NAME}/postgres-backups/${BACKUP_TYPE}/${backup_filename}"
+        
+        echo "Uploading backup to: ${S3_PATH}"
+        
+        # Upload using s3cmd
+        s3cmd put /tmp/${backup_filename} ${S3_PATH} --no-progress
+        
+        # Verify upload
+        if s3cmd ls ${S3_PATH} | grep -q ${backup_filename}; then
+          echo "✅ Backup uploaded successfully"
+        else
+          echo "❌ Backup upload failed"
+          exit 1
+        fi
+
+    - name: Cleanup old backups
+      run: |
+        echo "Cleaning up old backups..."
+        
+        # Define retention periods
+        DAILY_RETENTION_DAYS=30
+        WEEKLY_RETENTION_DAYS=90
+        MANUAL_RETENTION_DAYS=30
+        
+        # Function to delete old backups
+        cleanup_old_backups() {
+          local backup_type=$1
+          local retention_days=$2
+          local cutoff_date=$(date -u -d "${retention_days} days ago" +%Y-%m-%d)
+          
+          echo "Cleaning ${backup_type} backups older than ${cutoff_date}"
+          
+          # List and delete old backups
+          s3cmd ls s3://${DO_SPACES_NAME}/postgres-backups/${backup_type}/ | while read -r line; do
+            file_date=$(echo "$line" | awk '{print $1}')
+            file_path=$(echo "$line" | awk '{print $4}')
+            
+            if [[ "$file_date" < "$cutoff_date" ]]; then
+              echo "Deleting old backup: $(basename "$file_path")"
+              s3cmd del "$file_path"
+            fi
+          done
+        }
+        
+        # Cleanup based on retention policies
+        cleanup_old_backups "daily" ${DAILY_RETENTION_DAYS}
+        cleanup_old_backups "weekly" ${WEEKLY_RETENTION_DAYS}
+        cleanup_old_backups "manual" ${MANUAL_RETENTION_DAYS}
+
+    - name: Generate backup report
+      run: |
+        echo "## Backup Report"
+        echo ""
+        echo "**Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+        echo "**Type:** ${{ steps.backup_type.outputs.type }}"
+        echo "**Filename:** ${backup_filename}"
+        echo "**Size:** ${backup_size}"
+        echo ""
+        echo "### Current Backups in DigitalOcean Spaces"
+        echo ""
+        
+        for type in daily weekly manual; do
+          echo "#### ${type^} Backups"
+          s3cmd ls s3://${DO_SPACES_NAME}/postgres-backups/${type}/ | tail -5 | while read -r line; do
+            echo "- $(echo "$line" | awk '{print $1, $2, "-", $NF}' | sed 's|.*/||')"
+          done
+          echo ""
+        done
+
+    - name: Send Slack notification
+      if: always() && env.SLACK_WEBHOOK != ''
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      run: |
+        STATUS_EMOJI=$([[ "${{ job.status }}" == "success" ]] && echo "✅" || echo "❌")
+        STATUS_TEXT=$([[ "${{ job.status }}" == "success" ]] && echo "successful" || echo "failed")
+        
+        if [ "${{ job.status }}" == "success" ]; then
+          MESSAGE="${STATUS_EMOJI} PostgreSQL backup ${STATUS_TEXT}\n*Type:* ${{ steps.backup_type.outputs.type }}\n*Size:* ${backup_size}\n*File:* ${backup_filename}"
+        else
+          MESSAGE="${STATUS_EMOJI} PostgreSQL backup ${STATUS_TEXT}\n*Type:* ${{ steps.backup_type.outputs.type }}\n*Error:* Check GitHub Actions logs"
+        fi
+        
+        curl -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"${MESSAGE}\"}" \
+          ${SLACK_WEBHOOK} || echo "Slack notification failed"
+
+    - name: Cleanup temporary files
+      if: always()
+      run: |
+        rm -f /tmp/mastodon-*.sql.gz
+        rm -rf awscliv2.zip aws/

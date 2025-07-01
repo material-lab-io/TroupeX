@@ -315,6 +315,26 @@ jobs:
         
         chmod +x deployment/deploy.sh
 
+    - name: Pre-deployment backup
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      env:
+        DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        DROPLET_USER: ${{ secrets.DROPLET_USER }}
+      run: |
+        echo "Creating pre-deployment backup..."
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} << 'ENDSSH'
+          # Check if backup script exists
+          if [ -f ~/bin/backup-postgres.sh ]; then
+            echo "Running pre-deployment backup..."
+            ~/bin/backup-postgres.sh pre-deploy || {
+              echo "Warning: Pre-deployment backup failed, but continuing with deployment"
+              # Don't fail the deployment if backup fails
+            }
+          else
+            echo "Backup script not found, skipping pre-deployment backup"
+          fi
+        ENDSSH
+
     - name: Deploy to server
       env:
         DROPLET_IP: ${{ secrets.DROPLET_IP }}
