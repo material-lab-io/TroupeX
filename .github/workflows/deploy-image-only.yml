@@ -141,8 +141,6 @@ jobs:
         
         # Create minimal docker-compose for production
         cat > deployment/docker-compose.yml << 'EOF'
-        version: '3'
-
         services:
           db:
             restart: always
@@ -250,12 +248,12 @@ jobs:
         echo "Running database migrations..."
         docker compose run --rm web rails db:migrate
         
-        # Update services with zero downtime
+        # Update services
         echo "Updating services..."
-        docker compose up -d --no-deps --scale web=2 web
-        sleep 30
-        docker compose up -d --no-deps web
-        docker compose up -d --no-deps streaming sidekiq
+        docker compose up -d --no-deps web streaming sidekiq
+        
+        # The zero-downtime scaling doesn't work with port mapping
+        # Just do a quick restart which takes < 10 seconds
         
         # Clean up old containers
         echo "Cleaning up..."
