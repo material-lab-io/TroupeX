@@ -59,19 +59,24 @@ jobs:
     - name: Build and push web image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./Dockerfile
+        context: ./mastodon
+        file: ./mastodon/Dockerfile
         push: true
         tags: ${{ env.REGISTRY }}/material-lab-io/troupex-web:main
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64
+        build-args: |
+          RAILS_ENV=production
+          NODE_ENV=production
+          RUBY_VERSION=3.4.4
+          NODE_MAJOR_VERSION=22
 
     - name: Build and push streaming image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ./streaming/Dockerfile
+        context: ./mastodon
+        file: ./mastodon/streaming/Dockerfile
         push: true
         tags: ${{ env.REGISTRY }}/material-lab-io/troupex-streaming:main
         cache-from: type=gha
