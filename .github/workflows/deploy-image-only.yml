@@ -236,6 +236,9 @@ jobs:
         DROPLET_IP: ${{ secrets.DROPLET_IP }}
         DROPLET_USER: ${{ secrets.DROPLET_USER }}
       run: |
+        # Ensure deployment directory exists
+        ssh -o StrictHostKeyChecking=no ${DROPLET_USER}@${DROPLET_IP} "mkdir -p /home/${DROPLET_USER}/troupex"
+        
         # Upload deployment files
         scp -o StrictHostKeyChecking=no deployment/docker-compose.yml ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
         scp deployment/deploy.sh ${DROPLET_USER}@${DROPLET_IP}:/home/${DROPLET_USER}/troupex/
