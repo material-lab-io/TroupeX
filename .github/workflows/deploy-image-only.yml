@@ -3,6 +3,11 @@ name: Deploy TroupeX (Image-Only)
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'mastodon/**'
+      - '.github/workflows/deploy-image-only.yml'
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
   workflow_dispatch:
     inputs:
       environment:
@@ -13,6 +18,10 @@ on:
         options:
         - production
         - staging
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'production' }}
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
