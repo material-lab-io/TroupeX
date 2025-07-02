@@ -274,30 +274,25 @@ class ComposeForm extends ImmutablePureComponent {
           <PollForm />
 
           <div className='compose-form__footer'>
-            <div className='compose-form__dropdowns'>
+            <div className='compose-form__buttons'>
               <PrivacyDropdownContainer disabled={this.props.isEditing} />
+              <UploadButtonContainer />
+              <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
             </div>
 
-            <div className='compose-form__actions'>
-              <div className='compose-form__buttons'>
-                <UploadButtonContainer />
-                <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
-              </div>
-
-              <div className='compose-form__submit'>
-                <Button
-                  type='submit'
-                  compact
-                  disabled={!this.canSubmit()}
-                  loading={isSubmitting}
-                >
-                  {intl.formatMessage(
-                    this.props.isEditing ?
-                      messages.saveChanges : 
-                      (this.props.isInReply ? messages.reply : messages.publish)
-                  )}
-                </Button>
-              </div>
+            <div className='compose-form__submit'>
+              <Button
+                type='submit'
+                compact
+                disabled={!this.canSubmit()}
+                loading={isSubmitting}
+              >
+                {intl.formatMessage(
+                  this.props.isEditing ?
+                    messages.saveChanges : 
+                    (this.props.isInReply ? messages.reply : messages.publish)
+                )}
+              </Button>
             </div>
           </div>
         </div>

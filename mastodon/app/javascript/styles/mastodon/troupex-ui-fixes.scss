@@ -405,6 +405,61 @@
   }
 }
 
+// Compose form single-line layout
+.compose-form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  
+  .compose-form__buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    
+    // Privacy dropdown styling
+    .dropdown-button {
+      height: 36px;
+      min-width: auto;
+      padding: 0 12px;
+      
+      .dropdown-button__label {
+        margin-left: 4px;
+      }
+    }
+    
+    // Upload button
+    .compose-form__upload-button-icon {
+      height: 36px;
+      width: 36px;
+      padding: 8px;
+    }
+    
+    // Character counter
+    .character-counter {
+      margin-left: auto;
+      padding: 0 8px;
+    }
+  }
+  
+  .compose-form__submit {
+    flex-shrink: 0;
+    
+    .button {
+      height: 36px;
+      min-width: 64px;
+    }
+  }
+}
+
+// Remove old compose form layout styles
+.compose-form__dropdowns,
+.compose-form__actions {
+  display: contents; // Remove wrapper divs from layout
+}
+
 // Debug helper - Remove in production
 .debug-nav-state {
   position: fixed;
