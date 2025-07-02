@@ -8,6 +8,7 @@
   --brand-primary: #1d9bf0; // Twitter blue
   --brand-primary-hover: #1a8cd8;
   --brand-primary-light: rgba(29, 155, 240, 10%);
+  --brand-primary-alpha-10: rgba(29, 155, 240, 0.1);
   
   // Neutral Colors - True neutrals
   --neutral-0: #000;
@@ -49,7 +50,7 @@ body.app-body,
   --bg-primary: var(--neutral-0);
   --bg-secondary: var(--neutral-100);
   --bg-tertiary: var(--neutral-200);
-  --bg-elevated: var(--neutral-100);
+  --bg-elevated: var(--neutral-150);
   --bg-hover: rgba(255, 255, 255, 3%);
   --bg-active: rgba(255, 255, 255, 5%);
   --bg-modal-backdrop: rgba(91, 112, 131, 40%);

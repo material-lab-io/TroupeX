@@ -2,20 +2,21 @@ import PropTypes from 'prop-types';
 
 import { FormattedMessage } from 'react-intl';
 
+import { List as ImmutableList } from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { connect } from 'react-redux';
 
-import { normalizeForLookup } from 'mastodon/reducers/accounts_map';
 import { expandAccountFeaturedTimeline } from 'mastodon/actions/timelines';
 import { ColumnBackButton } from 'mastodon/components/column_back_button';
 import StatusList from 'mastodon/components/status_list';
 import Column from 'mastodon/features/ui/components/column';
+import { normalizeForLookup } from 'mastodon/reducers/accounts_map';
+import { getStatusList } from 'mastodon/selectors';
+
 import { AccountHeader } from '../account_timeline/components/account_header';
 import { LimitedAccountHint } from '../account_timeline/components/limited_account_hint';
 import BundleColumnError from '../ui/components/bundle_column_error';
-import { getStatusList } from 'mastodon/selectors';
-import { List as ImmutableList } from 'immutable';
 
 const emptyList = ImmutableList();
 

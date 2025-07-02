@@ -29,7 +29,9 @@
     overflow: hidden;
   }
   
-  position: relative;
+  & {
+    position: relative;
+  }
 }
 
 // Fix admin wrapper (settings pages) layout
@@ -45,6 +47,8 @@
   @media screen and (max-width: 890px) {
     // On mobile, ensure sidebar and content stack properly
     flex-direction: column;
+    height: auto;
+    min-height: calc(var(--mobile-viewport-height) - 48px - 56px);
     
     .sidebar-wrapper {
       position: relative;
@@ -57,6 +61,11 @@
       width: 100%;
       max-width: 100%;
       padding: 0 15px;
+      padding-bottom: 80px; // Extra padding for save button
+      
+      @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+      }
     }
   }
 }
@@ -269,6 +278,20 @@
   
   .settings-page {
     margin-top: 0 !important;
+  }
+}
+
+// Settings pages form padding fix
+.settings-page {
+  @media screen and (width <= 767px) {
+    // Add padding to bottom of forms to ensure save button is visible
+    form {
+      padding-bottom: 80px; // Extra space for bottom nav + safe area
+      
+      @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+      }
+    }
   }
 }
 

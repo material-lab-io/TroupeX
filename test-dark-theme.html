@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TroupeX Dark Theme Test</title>
+    <style>
+        :root {
+            --troupex-bg-primary: #0f1419;
+            --troupex-bg-secondary: #1a1f26;
+            --troupex-text-primary: #e7e9ea;
+            --troupex-brand-primary: #1d9bf0;
+        }
+        
+        body {
+            background: var(--troupex-bg-primary);
+            color: var(--troupex-text-primary);
+            font-family: -apple-system, sans-serif;
+            padding: 40px;
+            margin: 0;
+        }
+        
+        .card {
+            background: var(--troupex-bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--troupex-text-primary);
+        }
+        
+        a {
+            color: var(--troupex-brand-primary);
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .before {
+            background: #000;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .after {
+            background: #0f1419;
+            padding: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>TroupeX Dark Theme Test</h1>
+    
+    <div class="card">
+        <h2>New Dark Theme Colors</h2>
+        <p>Background: #0f1419 (dark blue-gray)</p>
+        <p>Cards: #1a1f26 (slightly lighter)</p>
+        <p>Text: #e7e9ea (off-white)</p>
+        <p>Brand: #1d9bf0 (bright blue)</p>
+    </div>
+    
+    <div class="comparison">
+        <div class="before">
+            <h3 style="color: white">Before (Pure Black)</h3>
+            <p style="color: white">This was too harsh</p>
+        </div>
+        <div class="after">
+            <h3 style="color: #e7e9ea">After (Dark Blue-Gray)</h3>
+            <p style="color: #e7e9ea">Much easier on the eyes</p>
+        </div>
+    </div>
+    
+    <p>Check TroupeX at: <a href="http://localhost:3000/auth/sign_in">http://localhost:3000/auth/sign_in</a></p>
+</body>
+</html>

@@ -6,7 +6,10 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 import { NavLink } from 'react-router-dom';
 
+import { PersonaProfileDisplay } from '@/mastodon/components/persona_profile_display';
+import { ProfilePhotoCarousel } from '@/mastodon/components/profile_photo_carousel';
 import CheckIcon from '@/material-icons/400-24px/check.svg?react';
+import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
@@ -819,69 +822,65 @@ export const AccountHeader: React.FC<{
             <FollowRequestNoteContainer account={account} />
           )}
 
-        <div className='account__header__image'>
-          <div className='account__header__info'>{info}</div>
-
-          {!(suspended || hidden) && (
-            <img
-              src={autoPlayGif ? account.header : account.header_static}
-              alt=''
-              className='parallax'
-            />
-          )}
+        <div className='account__header__professional'>
+          {/* Info badges moved to below profile */}
         </div>
 
         <div className='account__header__bar'>
-          <div className='account__header__tabs'>
-            <a
-              className='avatar'
-              href={account.avatar}
-              rel='noopener'
-              target='_blank'
-              onClick={handleOpenAvatar}
-            >
-              <Avatar
-                account={suspended || hidden ? undefined : account}
-                size={92}
-              />
-            </a>
-
-            <div className='account__header__tabs__buttons'>
-              {!hidden && bellBtn}
-              {!hidden && shareBtn}
-              {accountId !== me && (
-                <Dropdown
-                  disabled={menu.length === 0}
-                  items={menu}
-                  icon='ellipsis-v'
-                  iconComponent={MoreHorizIcon}
+          <div className='account__header__profile-frame'>
+            <ProfilePhotoCarousel
+              account={account}
+              editable={false}
+              onPhotoClick={() => handleOpenAvatar({ currentTarget: null } as any)}
+              displayMode='frame'
+            />
+            
+            <div className='account__header__name-section'>
+              <h1>
+                <span className='account__header__display-name' dangerouslySetInnerHTML={displayNameHtml} />
+                {lockedIcon}
+              </h1>
+            </div>
+            
+            {/* Bio section - moved up for prominence */}
+            {!(suspended || hidden) && account.note.length > 0 && account.note !== '<p></p>' && (
+              <div className='account__header__bio-prominent'>
+                <div
+                  className='account__header__content translate'
+                  dangerouslySetInnerHTML={content}
+                  onClickCapture={handleLinkClick}
                 />
+              </div>
+            )}
+            
+            <PersonaProfileDisplay account={account} />
+            
+            {/* Floating action buttons */}
+            <div className='account__header__floating-actions'>
+              {!hidden && (
+                <>
+                  {me === account.id ? (
+                    <a href='/settings/profile' className='floating-action-btn' title={intl.formatMessage(messages.edit_profile)}>
+                      <Icon id='edit' icon={EditIcon} />
+                    </a>
+                  ) : (
+                    actionBtn
+                  )}
+                  {shareBtn}
+                  {accountId !== me && (
+                    <Dropdown
+                      disabled={menu.length === 0}
+                      items={menu}
+                      icon='ellipsis-v'
+                      iconComponent={MoreHorizIcon}
+                    />
+                  )}
+                </>
               )}
-              {!hidden && actionBtn}
             </div>
           </div>
 
-          <div className='account__header__tabs__name'>
-            <h1>
-              <span dangerouslySetInnerHTML={displayNameHtml} />
-              <small>
-                <span>
-                  @{username}
-                  <span className='invisible'>@{domain}</span>
-                </span>
-                <DomainPill
-                  username={username ?? ''}
-                  domain={domain ?? ''}
-                  isSelf={me === account.id}
-                />
-                {lockedIcon}
-              </small>
-            </h1>
-          </div>
-
-          {badges.length > 0 && (
-            <div className='account__header__badges'>{badges}</div>
-          )}
+          {/* Remove badges for film industry aesthetic */}
 
           {account.id !== me && signedIn && !(suspended || hidden) && (
             <FamiliarFollowers accountId={accountId} />
@@ -904,65 +903,7 @@ export const AccountHeader: React.FC<{
                   />
                 )}
 
-                <div className='account__header__fields'>
-                  <dl>
-                    <dt>
-                      <FormattedMessage
-                        id='account.joined_short'
-                        defaultMessage='Joined'
-                      />
-                    </dt>
-                    <dd>
-                      <FormattedDateWrapper
-                        value={account.created_at}
-                        year='numeric'
-                        month='short'
-                        day='2-digit'
-                      />
-                    </dd>
-                  </dl>
-
-                  {fields.map((pair, i) => (
-                    <dl
-                      key={i}
-                      className={classNames({
-                        verified: pair.verified_at,
-                      })}
-                    >
-                      <dt
-                        dangerouslySetInnerHTML={{
-                          __html: pair.name_emojified,
-                        }}
-                        title={pair.name}
-                        className='translate'
-                      />
-
-                      <dd className='translate' title={pair.value_plain ?? ''}>
-                        {pair.verified_at && (
-                          <span
-                            title={intl.formatMessage(messages.linkVerifiedOn, {
-                              date: intl.formatDate(
-                                pair.verified_at,
-                                dateFormatOptions,
-                              ),
-                            })}
-                          >
-                            <Icon
-                              id='check'
-                              icon={CheckIcon}
-                              className='verified__mark'
-                            />
-                          </span>
-                        )}{' '}
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: pair.value_emojified,
-                          }}
-                        />
-                      </dd>
-                    </dl>
-                  ))}
-                </div>
+                <PersonaProfileDisplay account={account} />
               </div>
 
               <div className='account__header__extra__links'>
@@ -1003,22 +944,6 @@ export const AccountHeader: React.FC<{
         </div>
       </div>
 
-      {!(hideTabs || hidden) && (
-        <div className='account__section-headline'>
-          <NavLink exact to={`/@${account.acct}`}>
-            <FormattedMessage id='account.posts' defaultMessage='Posts' />
-          </NavLink>
-          <NavLink exact to={`/@${account.acct}/showcase`}>
-            <FormattedMessage id='account.showcase' defaultMessage='Showcase' />
-          </NavLink>
-          <NavLink exact to={`/@${account.acct}/with_replies`}>
-            <FormattedMessage
-              id='account.posts_with_replies'
-              defaultMessage='Posts and replies'
-            />
-          </NavLink>
-        </div>
-      )}
 
       <Helmet>
         <title>{titleFromAccount(account)}</title>

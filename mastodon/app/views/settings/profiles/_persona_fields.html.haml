@@ -1,0 +1,95 @@
+.persona-profile-fields
+  %h4.persona-profile-fields__title Professional Profile
+  
+  .persona-profile-fields__info
+    %p Use these fields to create your professional profile for the film and creative industry.
+  
+  .fields-row
+    .fields-row__column.fields-row__column-6
+      .fields-group
+        %label.persona-field-label Industry Category
+        .persona-selector
+          %label.persona-option
+            %input{type: 'radio', name: 'persona_type', value: 'creative', class: 'persona-radio'}
+            %span.persona-option__content
+              %i.fa.fa-paint-brush
+              %span Creative
+          %label.persona-option
+            %input{type: 'radio', name: 'persona_type', value: 'technical', class: 'persona-radio'}
+            %span.persona-option__content
+              %i.fa.fa-video-camera
+              %span Technical
+          %label.persona-option
+            %input{type: 'radio', name: 'persona_type', value: 'production', class: 'persona-radio'}
+            %span.persona-option__content
+              %i.fa.fa-film
+              %span Production
+          %label.persona-option
+            %input{type: 'radio', name: 'persona_type', value: 'support', class: 'persona-radio'}
+            %span.persona-option__content
+              %i.fa.fa-cog
+              %span Support
+              
+  .persona-field-instructions
+    %p.hint Fill in the custom fields below with your professional information:
+    %ul.hint
+      %li 
+        %strong Field 1: 
+        Your professional role (e.g., "Director", "Cinematographer")
+      %li 
+        %strong Field 2: 
+        Credits - List your projects as: ProjectName (Year) - Role
+      %li 
+        %strong Field 3: 
+        One Day / Dream - Your aspirations
+      %li 
+        %strong Field 4: 
+        Favorites - Your inspirations and influences
+
+:javascript
+  document.addEventListener('DOMContentLoaded', function() {
+    const personaRadios = document.querySelectorAll('.persona-radio');
+    const fieldInputs = document.querySelectorAll('input[name*="fields_attributes"][name*="[name]"]');
+    
+    // Define persona roles
+    const personaRoles = {
+      creative: ['Actor', 'Artist', 'Writer', 'Composer', 'Choreographer'],
+      technical: ['Cinematographer', 'Lighting Expert', 'VFX Artist', 'Camera Operator', 'Gaffer'],
+      production: ['Director', 'Producer', 'Assistant Director', 'Production Manager', 'Casting Director'],
+      support: ['Editor', 'Sound Designer', 'Makeup Artist', 'Costume Designer', 'Set Designer']
+    };
+    
+    // Update field labels based on saved data
+    function detectPersonaFromRole() {
+      const roleField = fieldInputs[0];
+      if (roleField && roleField.value === 'Role') {
+        const roleValue = roleField.parentElement.querySelector('input[name*="[value]"]').value;
+        for (const [persona, roles] of Object.entries(personaRoles)) {
+          if (roles.some(role => roleValue.includes(role))) {
+            document.querySelector(`input[value="${persona}"]`).checked = true;
+            break;
+          }
+        }
+      }
+    }
+    
+    // Set default field names if empty
+    function setDefaultFieldNames() {
+      const defaults = ['Role', 'Credits', 'One Day / Dream', 'Favorites'];
+      fieldInputs.forEach((input, index) => {
+        if (index < defaults.length && !input.value) {
+          input.value = defaults[index];
+        }
+      });
+    }
+    
+    detectPersonaFromRole();
+    setDefaultFieldNames();
+    
+    // Handle persona selection
+    personaRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        // You can add logic here to update role suggestions
+      });
+    });
+  });
