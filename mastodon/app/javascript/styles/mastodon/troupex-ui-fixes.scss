@@ -513,6 +513,20 @@
   display: none;
 }
 
+// Empty home timeline styling
+.empty-home-timeline {
+  &__message {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    margin-bottom: 10px;
+  }
+}
+
 // Debug helper - Remove in production
 .debug-nav-state {
   position: fixed;
