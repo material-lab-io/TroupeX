@@ -287,6 +287,22 @@
     touch-action: none;
   }
   
+  // Ensure compose form stays on one line on mobile
+  .compose-form {
+    .compose-form__footer {
+      padding: 6px 0;
+      
+      // Force single line on smaller screens
+      @media screen and (width <= 400px) {
+        gap: 2px;
+        
+        .compose-form__buttons {
+          gap: 2px;
+        }
+      }
+    }
+  }
+  
   // Adjust content padding on mobile
   .admin-wrapper {
     .content-wrapper {
@@ -409,38 +425,69 @@
 .compose-form__footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
   padding: 8px 0;
+  flex-wrap: nowrap;
   
   .compose-form__buttons {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     flex: 1;
+    min-width: 0; // Allow flex item to shrink
     
     // Privacy dropdown styling
     .dropdown-button {
-      height: 36px;
-      min-width: auto;
-      padding: 0 12px;
+      height: 32px;
+      min-width: 0;
+      padding: 0 8px;
+      flex-shrink: 0;
       
-      .dropdown-button__label {
-        margin-left: 4px;
+      @media screen and (width <= 767px) {
+        // Hide label text on mobile, show icon only
+        .dropdown-button__label {
+          display: none;
+        }
+        
+        // Make icon slightly smaller on mobile
+        .icon {
+          width: 20px;
+          height: 20px;
+        }
       }
+      
+      @media screen and (width > 767px) {
+        .dropdown-button__label {
+          margin-left: 4px;
+        }
+      }
+    }
+    
+    // Upload button container
+    .compose-form__upload-button {
+      flex-shrink: 0;
     }
     
     // Upload button
     .compose-form__upload-button-icon {
-      height: 36px;
-      width: 36px;
-      padding: 8px;
+      height: 32px;
+      width: 32px;
+      padding: 6px;
+      line-height: 20px !important;
+      
+      .icon {
+        width: 20px;
+        height: 20px;
+      }
     }
     
     // Character counter
     .character-counter {
       margin-left: auto;
-      padding: 0 8px;
+      padding: 0 4px;
+      font-size: 13px;
+      line-height: 32px;
+      flex-shrink: 0;
     }
   }
   
@@ -448,8 +495,14 @@
     flex-shrink: 0;
     
     .button {
-      height: 36px;
-      min-width: 64px;
+      height: 32px;
+      min-width: 0;
+      padding: 0 12px;
+      font-size: 14px;
+      
+      @media screen and (width <= 320px) {
+        padding: 0 8px;
+      }
     }
   }
 }
