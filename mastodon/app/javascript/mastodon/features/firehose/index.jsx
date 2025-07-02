@@ -4,7 +4,6 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 
 import { Helmet } from 'react-helmet';
-import { NavLink } from 'react-router-dom';
 
 import { useIdentity } from '@/mastodon/identity_context';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
@@ -139,15 +138,10 @@ const Firehose = ({ feedType, multiColumn }) => {
     </DismissableBanner>
   );
 
-  const emptyMessage = feedType === 'community' ? (
+  const emptyMessage = (
     <FormattedMessage
       id='empty_column.community'
       defaultMessage='The local timeline is empty. Write something publicly to get the ball rolling!'
-    />
-  ) : (
-    <FormattedMessage
-      id='empty_column.public'
-      defaultMessage='There is nothing here! Write something publicly, or manually follow users from other servers to fill it up'
     />
   );
 
@@ -165,19 +159,6 @@ const Firehose = ({ feedType, multiColumn }) => {
         <ColumnSettings />
       </ColumnHeader>
 
-      <div className='account__section-headline'>
-        <NavLink exact to='/public/local'>
-          <FormattedMessage tagName='div' id='firehose.local' defaultMessage='This server' />
-        </NavLink>
-
-        <NavLink exact to='/public/remote'>
-          <FormattedMessage tagName='div' id='firehose.remote' defaultMessage='Other servers' />
-        </NavLink>
-
-        <NavLink exact to='/public'>
-          <FormattedMessage tagName='div' id='firehose.all' defaultMessage='All' />
-        </NavLink>
-      </div>
 
       <StatusListContainer
         prepend={prependBanner}

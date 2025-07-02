@@ -1,9 +1,11 @@
 import { useCallback } from 'react';
+
 import { useHistory, useLocation } from 'react-router-dom';
-import { Icon } from 'mastodon/components/icon';
-import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
+
 import ArrowBackIcon from '@/material-icons/400-24px/arrow_back.svg?react';
+import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import { toggleNavigation } from 'mastodon/actions/navigation';
+import { Icon } from 'mastodon/components/icon';
 import { useAppDispatch } from 'mastodon/store';
 
 export const TroupeXNavigation: React.FC = () => {
@@ -20,7 +22,7 @@ export const TroupeXNavigation: React.FC = () => {
   }, [history]);
 
   // Show back button on profile pages and other detail pages
-  const showBackButton = location.pathname.match(/^\/(@[^/]+|statuses\/|accounts\/)/);
+  const showBackButton = /^\/(@[^/]+|statuses\/|accounts\/)/.test(location.pathname);
 
   return (
     <div className='troupex-top-nav'>

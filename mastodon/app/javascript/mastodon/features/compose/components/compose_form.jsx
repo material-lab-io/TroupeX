@@ -16,16 +16,12 @@ import AutosuggestInput from 'mastodon/components/autosuggest_input';
 import AutosuggestTextarea from 'mastodon/components/autosuggest_textarea';
 import { Button } from 'mastodon/components/button';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
-import EmojiPickerDropdown from '../containers/emoji_picker_dropdown_container';
-import PollButtonContainer from '../containers/poll_button_container';
 import PrivacyDropdownContainer from '../containers/privacy_dropdown_container';
-import SpoilerButtonContainer from '../containers/spoiler_button_container';
 import UploadButtonContainer from '../containers/upload_button_container';
 import { countableText } from '../util/counter';
 
 import { CharacterCounter } from './character_counter';
 import { EditIndicator } from './edit_indicator';
-import { LanguageDropdown } from './language_dropdown';
 import { NavigationBar } from './navigation_bar';
 import { PollForm } from "./poll_form";
 import { ReplyIndicator } from './reply_indicator';
@@ -64,7 +60,6 @@ class ComposeForm extends ImmutablePureComponent {
     onSuggestionSelected: PropTypes.func.isRequired,
     onChangeSpoilerText: PropTypes.func.isRequired,
     onPaste: PropTypes.func.isRequired,
-    onPickEmoji: PropTypes.func.isRequired,
     autoFocus: PropTypes.bool,
     withoutNavigation: PropTypes.bool,
     anyMedia: PropTypes.bool,
@@ -217,14 +212,6 @@ class ComposeForm extends ImmutablePureComponent {
     this.composeForm = c;
   };
 
-  handleEmojiPick = (data) => {
-    const { text }     = this.props;
-    const position     = this.textareaRef.current.selectionStart;
-    const needsSpace   = data.custom && position > 0 && !allowedAroundShortCode.includes(text[position - 1]);
-
-    this.props.onPickEmoji(position, data, needsSpace);
-  };
-
   render () {
     const { intl, onPaste, autoFocus, withoutNavigation, maxChars, isSubmitting } = this.props;
     const { highlighted } = this.state;
@@ -287,34 +274,23 @@ class ComposeForm extends ImmutablePureComponent {
           <PollForm />
 
           <div className='compose-form__footer'>
-            <div className='compose-form__dropdowns'>
+            <div className='compose-form__buttons'>
               <PrivacyDropdownContainer disabled={this.props.isEditing} />
-              <LanguageDropdown />
-            </div>
-
-            <div className='compose-form__actions'>
-              <div className='compose-form__buttons'>
-                <UploadButtonContainer />
-                <PollButtonContainer />
-                <SpoilerButtonContainer />
-                <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
-                <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
-              </div>
-
-              <div className='compose-form__submit'>
-                <Button
-                  type='submit'
-                  compact
-                  disabled={!this.canSubmit()}
-                  loading={isSubmitting}
-                >
-                  {intl.formatMessage(
-                    this.props.isEditing ?
-                      messages.saveChanges : 
-                      (this.props.isInReply ? messages.reply : messages.publish)
-                  )}
-                </Button>
-              </div>
+              <UploadButtonContainer />
+              <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
+              <Button
+                type='submit'
+                compact
+                disabled={!this.canSubmit()}
+                loading={isSubmitting}
+                className='compose-form__submit-button'
+              >
+                {intl.formatMessage(
+                  this.props.isEditing ?
+                    messages.saveChanges : 
+                    (this.props.isInReply ? messages.reply : messages.publish)
+                )}
+              </Button>
             </div>
           </div>
         </div>

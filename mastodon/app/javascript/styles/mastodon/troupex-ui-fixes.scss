@@ -18,8 +18,17 @@
   height: var(--mobile-viewport-height-safe);
   max-height: var(--mobile-viewport-height);
   
-  // Ensure content doesn't overflow
-  overflow: hidden;
+  // Allow scrolling on mobile
+  @media screen and (width <= 767px) {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  // Desktop can remain as is
+  @media screen and (width > 767px) {
+    overflow: hidden;
+  }
+  
   position: relative;
 }
 
@@ -212,7 +221,27 @@
 }
 
 // Fix content area to account for both navs
-.columns-area,
+.columns-area {
+  @media screen and (width <= 767px) {
+    padding-top: 48px; // Top nav height
+    padding-bottom: 56px; // Bottom nav height
+    min-height: calc(var(--mobile-viewport-height) - 48px - 56px);
+    height: auto; // Allow natural height
+    overflow-y: visible; // Content should flow naturally
+    
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      padding-bottom: calc(56px + env(safe-area-inset-bottom));
+      min-height: calc(var(--mobile-viewport-height) - 48px - 56px - env(safe-area-inset-bottom));
+    }
+  }
+  
+  @media screen and (width > 767px) {
+    height: calc(var(--mobile-viewport-height) - 48px - 56px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 .content {
   padding-top: 48px; // Top nav height
   padding-bottom: 56px; // Bottom nav height
@@ -251,12 +280,27 @@
     overflow-x: hidden;
   }
   
-  // When navigation is open, prevent body scroll
+  // When navigation is open, prevent body scroll only when menu is open
   body.navigation-open,
   body.settings-menu-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
+    // Keep body scrollable but prevent background scrolling when menu is open
+    touch-action: none;
+  }
+  
+  // Ensure compose form stays on one line on mobile
+  .compose-form {
+    .compose-form__footer {
+      padding: 6px 0;
+      
+      // Force single line on smaller screens
+      @media screen and (width <= 400px) {
+        gap: 2px;
+        
+        .compose-form__buttons {
+          gap: 2px;
+        }
+      }
+    }
   }
   
   // Adjust content padding on mobile
@@ -376,6 +420,99 @@
     }
   }
 }
+
+// Compose form single-line layout
+.compose-form__footer {
+  padding: 8px 0;
+  
+  .compose-form__buttons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    
+    // Privacy dropdown styling
+    .dropdown-button {
+      height: 32px;
+      min-width: 0;
+      padding: 0 8px;
+      flex-shrink: 0;
+      
+      @media screen and (width <= 767px) {
+        // Hide label text on mobile, show icon only
+        .dropdown-button__label {
+          display: none;
+        }
+        
+        // Make icon slightly smaller on mobile
+        .icon {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      
+      @media screen and (width > 767px) {
+        .dropdown-button__label {
+          margin-left: 4px;
+        }
+      }
+    }
+    
+    // Upload button container
+    .compose-form__upload-button {
+      flex-shrink: 0;
+    }
+    
+    // Upload button
+    .compose-form__upload-button-icon {
+      height: 32px;
+      width: 32px;
+      padding: 6px;
+      line-height: 20px !important;
+      
+      .icon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    
+    // Character counter - push to right
+    .character-counter {
+      margin-left: auto;
+      padding: 0 4px;
+      font-size: 13px;
+      line-height: 32px;
+      flex-shrink: 0;
+    }
+    
+    // Submit button
+    .compose-form__submit-button {
+      height: 32px;
+      min-width: 0;
+      padding: 0 12px;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-left: 4px;
+      
+      @media screen and (width <= 320px) {
+        padding: 0 8px;
+      }
+    }
+  }
+}
+
+// Remove old compose form layout styles
+.compose-form__dropdowns,
+.compose-form__actions,
+.compose-form__submit {
+  display: contents; // Remove wrapper divs from layout
+}
+
+// Remove server navigation tabs spacing in firehose
+.column-header + .account__section-headline {
+  display: none;
+}
+
 
 // Debug helper - Remove in production
 .debug-nav-state {
