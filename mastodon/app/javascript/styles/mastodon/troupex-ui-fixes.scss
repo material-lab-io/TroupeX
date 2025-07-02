@@ -79,7 +79,7 @@
   }
 }
 
-// Fix navigation panel overlay for mobile
+// Fix navigation panel for mobile and desktop
 .navigation-panel {
   // Ensure tags and content have proper spacing from top nav
   padding-top: 8px;
@@ -91,31 +91,49 @@
     margin-top: 16px;
   }
   
-  // On mobile, ensure it's properly positioned
-  @media screen and (width <= 767px) {
-    position: fixed;
-    top: 48px; // Below top nav
-    bottom: 56px; // Above bottom nav
-    left: 0;
-    width: 280px; // Slightly wider for better usability
-    height: calc(var(--mobile-viewport-height) - 48px - 56px);
-    z-index: 9999;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    background: var(--bg-primary);
-    border-right: 1px solid var(--border-primary);
-    
-    &.active,
-    &.is-open {
-      transform: translateX(0);
-    }
-    
-    // Ensure content starts below any sticky elements
-    > * {
-      position: relative;
-      z-index: 1;
+  // Mobile navigation panel (when rendered via MobileNavigationController)
+  &.mobile-navigation {
+    @media screen and (width <= 767px) {
+      position: fixed;
+      top: 48px; // Below top nav
+      bottom: 56px; // Above bottom nav
+      left: 0;
+      width: 280px; // Slightly wider for better usability
+      height: calc(var(--mobile-viewport-height) - 48px - 56px);
+      z-index: 9999;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border-primary);
+      padding: 0; // Reset padding for mobile
+      
+      &.active,
+      &.is-open {
+        transform: translateX(0);
+      }
+      
+      // Add padding back to inner navigation panel
+      > .navigation-panel {
+        padding: 8px 0;
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      // Ensure content starts below any sticky elements
+      .navigation-panel__logo,
+      .search,
+      .simplified-navigation-profile,
+      .navigation-panel__menu {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      
+      .navigation-panel__menu {
+        padding-bottom: 16px;
+      }
     }
   }
 }

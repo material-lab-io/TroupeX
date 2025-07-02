@@ -70,7 +70,7 @@ export const MobileNavigationController: React.FC = () => {
         tabIndex={0}
         aria-label='Close navigation'
       />
-      <div className='navigation-panel active'>
+      <div className='navigation-panel mobile-navigation active'>
         <NavigationPanel />
       </div>
     </>,
