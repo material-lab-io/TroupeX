@@ -1,0 +1,56 @@
+.profile-error-boundary {
+  padding: 40px 20px;
+  text-align: center;
+  
+  &__content {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .icon {
+    width: 64px;
+    height: 64px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+  
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-emphasis);
+    margin-bottom: 12px;
+  }
+  
+  &__message {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  
+  &__details {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    text-align: left;
+    
+    summary {
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    pre {
+      margin: 8px 0 0;
+      padding: 12px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text-secondary);
+    }
+  }
+}

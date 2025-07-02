@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 import { NavLink } from 'react-router-dom';
 
+import { ProfileErrorBoundary } from '@/mastodon/components/error_boundary/profile_error_boundary';
 import { PersonaProfileDisplay } from '@/mastodon/components/persona_profile_display';
 import { ProfilePhotoCarousel } from '@/mastodon/components/profile_photo_carousel';
 import CheckIcon from '@/material-icons/400-24px/check.svg?react';
@@ -828,12 +829,14 @@ export const AccountHeader: React.FC<{
 
         <div className='account__header__bar'>
           <div className='account__header__profile-frame'>
-            <ProfilePhotoCarousel
-              account={account}
-              editable={false}
-              onPhotoClick={() => handleOpenAvatar({ currentTarget: null } as any)}
-              displayMode='frame'
-            />
+            <ProfileErrorBoundary>
+              <ProfilePhotoCarousel
+                account={account}
+                editable={false}
+                onPhotoClick={() => handleOpenAvatar({ currentTarget: null } as any)}
+                displayMode='frame'
+              />
+            </ProfileErrorBoundary>
             
             <div className='account__header__name-section'>
               <h1>
@@ -853,7 +856,9 @@ export const AccountHeader: React.FC<{
               </div>
             )}
             
-            <PersonaProfileDisplay account={account} />
+            <ProfileErrorBoundary>
+              <PersonaProfileDisplay account={account} />
+            </ProfileErrorBoundary>
             
             {/* Floating action buttons */}
             <div className='account__header__floating-actions'>

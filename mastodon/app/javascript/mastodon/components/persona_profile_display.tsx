@@ -154,13 +154,15 @@ export const PersonaProfileDisplay: React.FC<{
   }
 
   return (
-    <div className='persona-profile'>
+    <div className='persona-profile' role='region' aria-label='Professional profile information'>
       <div className='persona-profile__header'>
         <div 
           className='persona-profile__role'
           style={{ backgroundColor: personaColor }}
+          role='heading'
+          aria-level={3}
         >
-          <Icon id={profile.persona} icon={PersonaIcon} />
+          <Icon id={profile.persona} icon={PersonaIcon} aria-hidden='true' />
           <span>{profile.role}</span>
         </div>
       </div>
@@ -168,12 +170,12 @@ export const PersonaProfileDisplay: React.FC<{
       {profile.credits.length > 0 && (
         <div className='persona-profile__section'>
           <h4 className='persona-profile__section-title'>
-            <Icon id='calendar' icon={ListAltIcon} />
+            <Icon id='calendar' icon={ListAltIcon} aria-hidden='true' />
             <FormattedMessage id='persona.credits' defaultMessage='Credits' />
           </h4>
-          <div className='persona-profile__credits'>
+          <div className='persona-profile__credits' role='list'>
             {profile.credits.map((credit, index) => (
-              <div key={index} className='persona-profile__credit'>
+              <div key={index} className='persona-profile__credit' role='listitem'>
                 <span className='persona-profile__credit-project'>{credit.project}</span>
                 {credit.year && (
                   <span className='persona-profile__credit-year'>{credit.year}</span>
@@ -190,7 +192,7 @@ export const PersonaProfileDisplay: React.FC<{
       {(profile.oneDay || profile.dream) && (
         <div className='persona-profile__section'>
           <h4 className='persona-profile__section-title'>
-            <Icon id='rocket' icon={FlagIcon} />
+            <Icon id='rocket' icon={FlagIcon} aria-hidden='true' />
             <FormattedMessage id='persona.aspirations' defaultMessage='Aspirations' />
           </h4>
           {profile.oneDay && (
@@ -215,12 +217,12 @@ export const PersonaProfileDisplay: React.FC<{
       {profile.favorites.length > 0 && (
         <div className='persona-profile__section'>
           <h4 className='persona-profile__section-title'>
-            <Icon id='favorite' icon={StarIcon} />
+            <Icon id='favorite' icon={StarIcon} aria-hidden='true' />
             <FormattedMessage id='persona.favorites' defaultMessage='Favorites & Inspirations' />
           </h4>
-          <div className='persona-profile__favorites'>
+          <div className='persona-profile__favorites' role='list' aria-label='Favorite artists and inspirations'>
             {profile.favorites.map((favorite, index) => (
-              <span key={index} className='persona-profile__favorite'>
+              <span key={index} className='persona-profile__favorite' role='listitem'>
                 {favorite}
               </span>
             ))}

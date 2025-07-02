@@ -27,6 +27,9 @@ const messages = defineMessages({
     id: 'profile_carousel.slide',
     defaultMessage: 'Photo {index} of {total}',
   },
+  editPhoto: { id: 'profile.photo.edit', defaultMessage: 'Edit profile photo' },
+  viewPhoto: { id: 'profile.photo.view', defaultMessage: 'View profile photo' },
+  carousel: { id: 'profile.photo.carousel', defaultMessage: 'Profile photo carousel' },
 });
 
 interface ProfilePhoto {
@@ -138,6 +141,7 @@ export const ProfilePhotoCarousel: React.FC<{
             }}
             role={editable ? 'button' : undefined}
             tabIndex={editable ? 0 : undefined}
+            aria-label={editable ? intl.formatMessage(messages.editPhoto) : intl.formatMessage(messages.viewPhoto)}
           >
             <img
               src={autoPlayGif ? photos[0]?.url : (photos[0]?.thumbnail ?? photos[0]?.url)}
@@ -172,6 +176,7 @@ export const ProfilePhotoCarousel: React.FC<{
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handlePhotoClick(); }}
           role={editable ? 'button' : undefined}
           tabIndex={editable ? 0 : undefined}
+          aria-label={editable ? intl.formatMessage(messages.editPhoto) : intl.formatMessage(messages.viewPhoto)}
         >
           <Avatar
             account={account}
@@ -193,7 +198,7 @@ export const ProfilePhotoCarousel: React.FC<{
       className='profile-photo-carousel'
       {...bind()}
       aria-roledescription='carousel'
-      aria-labelledby={`${accessibilityId}-title`}
+      aria-label={intl.formatMessage(messages.carousel)}
       role='region'
     >
       <div className='profile-photo-carousel__container'>
@@ -220,6 +225,8 @@ export const ProfilePhotoCarousel: React.FC<{
             }}
               role={editable ? 'button' : undefined}
               tabIndex={editable && index === slideIndex ? 0 : undefined}
+              aria-label={editable ? intl.formatMessage(messages.editPhoto) : photo.description || intl.formatMessage(messages.viewPhoto)}
+              aria-hidden={index !== slideIndex ? 'true' : undefined}
             >
               <img
                 src={autoPlayGif ? photo.url : (photo.thumbnail ?? photo.url)}
