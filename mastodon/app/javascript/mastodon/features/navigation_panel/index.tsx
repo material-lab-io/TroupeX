@@ -33,9 +33,7 @@ import { Account } from 'mastodon/components/account';
 import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { WordmarkLogo } from 'mastodon/components/logo';
-import { Search } from 'mastodon/features/compose/components/search';
 import { ColumnLink } from 'mastodon/features/ui/components/column_link';
-import { useBreakpoint } from 'mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from 'mastodon/identity_context';
 import { timelinePreview, trendsEnabled, me } from 'mastodon/initial_state';
 import { transientSingleColumn } from 'mastodon/is_mobile';
@@ -185,7 +183,6 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const { signedIn, disabledAccountId } = useIdentity();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const showSearch = useBreakpoint('full') && !multiColumn;
 
   let banner: React.ReactNode;
 
@@ -211,7 +208,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
         </Link>
       </div>
 
-      {showSearch && <Search singleColumn />}
+      {/* Search removed - TroupeX doesn't need search functionality */}
 
       {!multiColumn && <SimplifiedNavigationProfile />}
 
