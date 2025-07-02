@@ -5,19 +5,17 @@ import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 
+import AccountCircleActiveIcon from '@/material-icons/400-24px/account_circle-fill.svg?react';
+import AccountCircleIcon from '@/material-icons/400-24px/account_circle.svg?react';
 import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
-import AccountCircleIcon from '@/material-icons/400-24px/account_circle.svg?react';
-import AccountCircleActiveIcon from '@/material-icons/400-24px/account_circle-fill.svg?react';
 import SearchIcon from '@/material-icons/400-24px/search.svg?react';
 import { openModal } from 'mastodon/actions/modal';
 import { fetchServer } from 'mastodon/actions/server';
 import { Icon } from 'mastodon/components/icon';
-import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { useIdentity } from 'mastodon/identity_context';
-import { registrationsOpen, sso_redirect } from 'mastodon/initial_state';
-import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
+import { registrationsOpen, sso_redirect, me } from 'mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 export const messages = defineMessages({
@@ -52,22 +50,22 @@ const IconLabelButton: React.FC<{
 
 const ProfileButton = () => {
   const intl = useIntl();
-  const isActive = window.location.pathname.startsWith('/settings/');
+  const { signedIn } = useIdentity();
+  const username = useAppSelector((state) => {
+    if (!me) return null;
+    const account = state.accounts.get(me);
+    return account?.get('username');
+  });
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.location.href = '/settings/profile';
-  };
+  if (!signedIn || !username) return null;
 
   return (
-    <a
-      className={`ui__navigation-bar__item ${isActive ? 'active' : ''}`}
-      href='/settings/profile'
-      onClick={handleClick}
-      aria-label={intl.formatMessage(messages.profile)}
-    >
-      <Icon id='person' icon={isActive ? AccountCircleActiveIcon : AccountCircleIcon} />
-    </a>
+    <IconLabelButton
+      title={intl.formatMessage(messages.profile)}
+      to={`/@${username}`}
+      icon={<Icon id='person' icon={AccountCircleIcon} />}
+      activeIcon={<Icon id='person' icon={AccountCircleActiveIcon} />}
+    />
   );
 };
 

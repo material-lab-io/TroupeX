@@ -31,6 +31,7 @@ import initialState, { me, owner, singleUserMode, trendsEnabled, trendsAsLanding
 import BundleColumnError from './components/bundle_column_error';
 import { NavigationBar } from './components/navigation_bar';
 import { TroupeXNavigation } from './components/troupex_navigation';
+import { MobileNavigationController } from './components/mobile_navigation_controller';
 import { UploadArea } from './components/upload_area';
 import { HashtagMenuController } from './components/hashtag_menu_controller';
 import ColumnsAreaContainer from './containers/columns_area_container';
@@ -615,6 +616,7 @@ class UI extends PureComponent {
 
           <TroupeXNavigation />
           <NavigationBar />
+          <MobileNavigationController />
           {layout !== 'mobile' && <PictureInPicture />}
           <AlertsController />
           {!disableHoverCards && <HoverCardController />}
