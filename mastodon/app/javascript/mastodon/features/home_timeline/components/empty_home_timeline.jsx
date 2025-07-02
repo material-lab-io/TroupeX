@@ -8,10 +8,12 @@ import { connect } from 'react-redux';
 import { expandCommunityTimeline } from 'mastodon/actions/timelines';
 import StatusList from 'mastodon/components/status_list';
 
+import { List as ImmutableList } from 'immutable';
+
 const mapStateToProps = state => ({
-  statusIds: state.getIn(['timelines', 'community', 'items']),
+  statusIds: state.getIn(['timelines', 'community', 'items'], ImmutableList()),
   isLoading: state.getIn(['timelines', 'community', 'isLoading'], true),
-  hasMore: state.getIn(['timelines', 'community', 'hasMore']),
+  hasMore: state.getIn(['timelines', 'community', 'hasMore'], false),
 });
 
 class EmptyHomeTimeline extends PureComponent {

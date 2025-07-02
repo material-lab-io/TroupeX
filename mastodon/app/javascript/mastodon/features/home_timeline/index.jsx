@@ -27,7 +27,6 @@ import StatusListContainer from '../ui/containers/status_list_container';
 
 import { ColumnSettings } from './components/column_settings';
 import { CriticalUpdateBanner } from './components/critical_update_banner';
-import { Search } from '../compose/components/search';
 import EmptyHomeTimeline from './components/empty_home_timeline';
 
 const messages = defineMessages({
@@ -42,7 +41,7 @@ const mapStateToProps = state => ({
   hasAnnouncements: !state.getIn(['announcements', 'items']).isEmpty(),
   unreadAnnouncements: state.getIn(['announcements', 'items']).count(item => !item.get('read')),
   showAnnouncements: state.getIn(['announcements', 'show']),
-  homeIsEmpty: state.getIn(['timelines', 'home', 'items'], []).size === 0 && !state.getIn(['timelines', 'home', 'isLoading']),
+  homeIsEmpty: state.getIn(['timelines', 'home', 'items'], []).size === 0 && !state.getIn(['timelines', 'home', 'isLoading'], true),
 });
 
 class HomeTimeline extends PureComponent {
@@ -157,9 +156,6 @@ class HomeTimeline extends PureComponent {
       <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.title)}>
         {hasAnnouncements && showAnnouncements && <AnnouncementsContainer />}
 
-        <div className='home-timeline-search'>
-          <Search singleColumn={!multiColumn} />
-        </div>
 
         {signedIn ? (
           homeIsEmpty ? (
