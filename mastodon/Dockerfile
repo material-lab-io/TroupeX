@@ -275,6 +275,8 @@ RUN \
 FROM build AS precompiler
 
 ARG TARGETPLATFORM
+# Cache bust argument to force rebuilding when frontend files change
+ARG CACHE_BUST
 
 # Copy Mastodon sources into layer
 COPY . /opt/mastodon/
@@ -305,6 +307,7 @@ COPY --from=bundler /usr/local/bundle/ /usr/local/bundle/
 
 RUN \
   ldconfig; \
+  echo "$CACHE_BUST"; \
   # Use Ruby on Rails to create Mastodon assets
   SECRET_KEY_BASE_DUMMY=1 \
   bundle exec rails assets:precompile; \
