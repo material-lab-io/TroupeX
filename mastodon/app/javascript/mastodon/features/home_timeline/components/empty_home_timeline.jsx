@@ -46,26 +46,17 @@ class EmptyHomeTimeline extends PureComponent {
     );
 
     return (
-      <div className='empty-home-timeline'>
-        <div className='empty-home-timeline__message'>
-          <FormattedMessage
-            id='empty_column.home.suggestions'
-            defaultMessage='Your home timeline is empty! Follow more people to fill it up. In the meantime, here are recent posts from your server:'
-          />
-        </div>
-        
-        <StatusList
-          trackScroll={false}
-          scrollKey='empty_home_timeline'
-          statusIds={statusIds}
-          onLoadMore={this.handleLoadMore}
-          timelineId='community'
-          emptyMessage={emptyMessage}
-          isLoading={isLoading}
-          hasMore={hasMore}
-          bindToDocument={!multiColumn}
-        />
-      </div>
+      <StatusList
+        trackScroll={false}
+        scrollKey='empty_home_timeline'
+        statusIds={statusIds}
+        onLoadMore={this.handleLoadMore}
+        timelineId='community'
+        emptyMessage={emptyMessage}
+        isLoading={isLoading}
+        hasMore={hasMore}
+        bindToDocument={!multiColumn}
+      />
     );
   }
 }
