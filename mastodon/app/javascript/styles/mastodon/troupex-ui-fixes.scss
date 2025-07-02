@@ -97,21 +97,21 @@
       position: fixed;
       top: 48px; // Below top nav
       bottom: 56px; // Above bottom nav
-      left: 0;
+      right: 0; // Position from right side
       width: 280px; // Slightly wider for better usability
       height: calc(var(--mobile-viewport-height) - 48px - 56px);
       z-index: 9999;
-      transform: translateX(-100%);
+      transform: translateX(100%); // Hide by sliding to the right
       transition: transform 0.3s ease;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       background: var(--bg-primary);
-      border-right: 1px solid var(--border-primary);
+      border-left: 1px solid var(--border-primary); // Border on left side now
       padding: 0; // Reset padding for mobile
       
       &.active,
       &.is-open {
-        transform: translateX(0);
+        transform: translateX(0); // Slide in from right
       }
       
       // Add padding back to inner navigation panel
