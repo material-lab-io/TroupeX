@@ -423,18 +423,13 @@
 
 // Compose form single-line layout
 .compose-form__footer {
-  display: flex;
-  align-items: center;
-  gap: 4px;
   padding: 8px 0;
-  flex-wrap: nowrap;
   
   .compose-form__buttons {
     display: flex;
     align-items: center;
     gap: 4px;
-    flex: 1;
-    min-width: 0; // Allow flex item to shrink
+    width: 100%;
     
     // Privacy dropdown styling
     .dropdown-button {
@@ -481,7 +476,7 @@
       }
     }
     
-    // Character counter
+    // Character counter - push to right
     .character-counter {
       margin-left: auto;
       padding: 0 4px;
@@ -489,16 +484,15 @@
       line-height: 32px;
       flex-shrink: 0;
     }
-  }
-  
-  .compose-form__submit {
-    flex-shrink: 0;
     
-    .button {
+    // Submit button
+    .compose-form__submit-button {
       height: 32px;
       min-width: 0;
       padding: 0 12px;
       font-size: 14px;
+      flex-shrink: 0;
+      margin-left: 4px;
       
       @media screen and (width <= 320px) {
         padding: 0 8px;
@@ -509,7 +503,8 @@
 
 // Remove old compose form layout styles
 .compose-form__dropdowns,
-.compose-form__actions {
+.compose-form__actions,
+.compose-form__submit {
   display: contents; // Remove wrapper divs from layout
 }
 

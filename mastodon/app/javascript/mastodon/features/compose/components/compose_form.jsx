@@ -278,14 +278,12 @@ class ComposeForm extends ImmutablePureComponent {
               <PrivacyDropdownContainer disabled={this.props.isEditing} />
               <UploadButtonContainer />
               <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
-            </div>
-
-            <div className='compose-form__submit'>
               <Button
                 type='submit'
                 compact
                 disabled={!this.canSubmit()}
                 loading={isSubmitting}
+                className='compose-form__submit-button'
               >
                 {intl.formatMessage(
                   this.props.isEditing ?
