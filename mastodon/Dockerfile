@@ -307,7 +307,7 @@ COPY --from=bundler /usr/local/bundle/ /usr/local/bundle/
 
 RUN \
   ldconfig; \
-  # Cache bust: ${CACHE_BUST}
+  echo "$CACHE_BUST"; \
   # Use Ruby on Rails to create Mastodon assets
   SECRET_KEY_BASE_DUMMY=1 \
   bundle exec rails assets:precompile; \
