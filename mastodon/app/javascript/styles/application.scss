@@ -44,3 +44,7 @@
 // Centralized Theme System
 @use 'mastodon/theme-system'; // CSS custom properties architecture
 @use 'mastodon/theme-components'; // Apply theme to all components
+
+// UI Fixes for consistent navigation and mobile usability
+@use 'mastodon/troupex-ui-fixes';
+@use 'mastodon/simplified-navigation-profile';

@@ -27,8 +27,10 @@ import StarActiveIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarIcon from '@/material-icons/400-24px/star.svg?react';
 import TrendingUpIcon from '@/material-icons/400-24px/trending_up.svg?react';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
+import { openModal } from 'mastodon/actions/modal';
 import { openNavigation, closeNavigation } from 'mastodon/actions/navigation';
 import { Account } from 'mastodon/components/account';
+import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { WordmarkLogo } from 'mastodon/components/logo';
 import { Search } from 'mastodon/features/compose/components/search';
@@ -40,13 +42,14 @@ import { transientSingleColumn } from 'mastodon/is_mobile';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
+import { SimplifiedNavigationProfile } from '../ui/components/simplified_navigation_profile';
+
 import { DisabledAccountBanner } from './components/disabled_account_banner';
 import { FollowedTagsPanel } from './components/followed_tags_panel';
 import { ListPanel } from './components/list_panel';
 import { MoreLink } from './components/more_link';
 import { SignInBanner } from './components/sign_in_banner';
 import { Trends } from './components/trends';
-import { NavigationPanelProfile } from '../ui/components/navigation_panel_profile';
 
 const messages = defineMessages({
   home: { id: 'tabs_bar.home', defaultMessage: 'Home' },
@@ -173,7 +176,7 @@ const isFirehoseActive = (
   return !!match || pathname.startsWith('/public');
 };
 
-const MENU_WIDTH = 284;
+const MENU_WIDTH = 320;
 
 export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   multiColumn = false,
@@ -181,6 +184,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const intl = useIntl();
   const { signedIn, disabledAccountId } = useIdentity();
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const showSearch = useBreakpoint('full') && !multiColumn;
 
   let banner: React.ReactNode;
@@ -209,7 +213,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
       {showSearch && <Search singleColumn />}
 
-      {!multiColumn && <NavigationPanelProfile />}
+      {!multiColumn && <SimplifiedNavigationProfile />}
 
       {banner && <div className='navigation-panel__banner'>{banner}</div>}
 
@@ -294,15 +298,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
               text={intl.formatMessage(messages.direct)}
             />
 
-            <hr />
-
-            <ColumnLink
-              transparent
-              href='/settings/preferences'
-              icon='cog'
-              iconComponent={SettingsIcon}
-              text={intl.formatMessage(messages.preferences)}
-            />
+            {/* Profile actions moved to SimplifiedNavigationProfile component */}
 
             <MoreLink />
           </>
