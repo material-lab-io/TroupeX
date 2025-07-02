@@ -39,7 +39,6 @@ jobs:
       streaming-image: ${{ steps.image.outputs.streaming-image }}
       tag: ${{ steps.image.outputs.tag }}
       build-streaming: ${{ steps.changes.outputs.streaming }}
-      frontend-hash: ${{ steps.frontend.outputs.hash }}
     
     steps:
     - name: Checkout repository
@@ -67,13 +66,6 @@ jobs:
           echo "No streaming changes - will use existing image"
         fi
     
-    - name: Generate frontend files hash
-      id: frontend
-      run: |
-        # Generate hash of all frontend files to bust cache when they change
-        HASH=$(find ./mastodon/app/javascript -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' -o -name '*.scss' -o -name '*.css' \) | sort | xargs sha256sum | sha256sum | cut -d' ' -f1)
-        echo "hash=${HASH:0:8}" >> $GITHUB_OUTPUT
-        echo "Frontend files hash: ${HASH:0:8}"
     
     - name: Generate image tags
       id: image
@@ -124,14 +116,11 @@ jobs:
         tags: |
           ${{ needs.prepare.outputs.web-image }}
           ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-web:latest
-        # Use frontend hash in cache scope to invalidate when JS/CSS changes
-        cache-from: type=gha,scope=web-${{ needs.prepare.outputs.frontend-hash }}
-        cache-to: type=gha,mode=max,scope=web-${{ needs.prepare.outputs.frontend-hash }}
         platforms: linux/amd64
         build-args: |
           RAILS_ENV=production
           NODE_ENV=production
-          CACHE_BUST=${{ github.sha }}-${{ needs.prepare.outputs.frontend-hash }}
+          CACHE_BUST=${{ github.sha }}
 
   build-streaming:
     needs: prepare
@@ -164,8 +153,6 @@ jobs:
         tags: |
           ${{ needs.prepare.outputs.streaming-image }}
           ${{ env.REGISTRY }}/${{ github.repository_owner }}/troupex-streaming:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
         platforms: linux/amd64
 
   deploy:
