@@ -508,6 +508,11 @@
   display: contents; // Remove wrapper divs from layout
 }
 
+// Remove server navigation tabs spacing in firehose
+.column-header + .account__section-headline {
+  display: none;
+}
+
 // Debug helper - Remove in production
 .debug-nav-state {
   position: fixed;
