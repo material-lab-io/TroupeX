@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
+
 import { Avatar } from 'mastodon/components/avatar';
-import { useAppSelector } from 'mastodon/store';
 import { me } from 'mastodon/initial_state';
+import { useAppSelector } from 'mastodon/store';
 
 export const NavigationPanelProfile: React.FC = () => {
   const account = useAppSelector(state => me ? state.accounts.get(me) : null);

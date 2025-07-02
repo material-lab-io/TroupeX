@@ -1,5 +1,5 @@
-import logo from '@/images/logo.svg';
 import wordmarkLogo from '@/images/logo-symbol-wordmark.svg';
+import logo from '@/images/logo.svg';
 
 export const WordmarkLogo: React.FC = () => (
   <img src={wordmarkLogo} alt='Mastodon' className='logo logo--wordmark' />
