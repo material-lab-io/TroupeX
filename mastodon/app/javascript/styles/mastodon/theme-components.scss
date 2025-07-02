@@ -1,0 +1,582 @@
+// Theme Component Mappings
+// This file applies the theme system variables to all UI components
+// No hardcoded colors should exist here - only variable references
+
+// Display Names - Consistent across all contexts
+.display-name {
+  &__html {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+  
+  &__account {
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+}
+
+// Apply to all display name contexts
+.status__display-name,
+.account__display-name,
+.detailed-status__display-name,
+.notification__display-name,
+.account-card__display-name {
+  .display-name__html {
+    color: var(--text-primary);
+  }
+  
+  .display-name__account {
+    color: var(--text-secondary);
+  }
+}
+
+// Status Components
+.status,
+.detailed-status {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  
+  &__content {
+    color: var(--text-primary);
+    
+    p, span, div {
+      color: inherit;
+    }
+    
+    a {
+      color: var(--text-link);
+      
+      &:hover {
+        color: var(--text-link-hover);
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  &__prepend {
+    color: var(--text-secondary);
+  }
+  
+  &__relative-time {
+    color: var(--text-tertiary);
+  }
+  
+  &__action-bar {
+    .icon-button {
+      color: var(--text-tertiary);
+      
+      &:hover {
+        color: var(--text-secondary);
+        background: var(--bg-hover);
+      }
+      
+      &.active {
+        &.star-icon {
+          color: var(--semantic-warning);
+        }
+        
+        &.reblog-icon {
+          color: var(--semantic-success);
+        }
+        
+        &.bookmark-icon {
+          color: var(--semantic-danger);
+        }
+      }
+    }
+  }
+}
+
+// Compose Form
+.compose-form {
+  background: var(--compose-bg);
+  border: 1px solid var(--compose-border);
+  
+  &__highlightable {
+    background: transparent;
+  }
+  
+  .autosuggest-textarea__textarea {
+    background: transparent;
+    color: var(--compose-text);
+    
+    &::placeholder {
+      color: var(--compose-placeholder);
+    }
+  }
+  
+  &__buttons {
+    .icon-button {
+      color: var(--button-primary-bg);
+      
+      &:hover {
+        background: var(--brand-primary-light);
+      }
+    }
+  }
+  
+  .character-counter {
+    color: var(--text-tertiary);
+  }
+  
+  .dropdown-button {
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    
+    &:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-hover);
+    }
+    
+    &__label {
+      color: inherit;
+    }
+    
+    .icon {
+      color: var(--button-primary-bg);
+    }
+  }
+}
+
+// Buttons - All variants
+.button {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: none;
+  
+  &:hover:not(:disabled) {
+    background: var(--button-primary-bg-hover);
+  }
+  
+  &:disabled {
+    background: var(--button-disabled-bg);
+    color: var(--button-disabled-text);
+  }
+  
+  &.button-secondary {
+    background: var(--button-secondary-bg);
+    border: 1px solid var(--button-secondary-border);
+    color: var(--button-secondary-text);
+    
+    &:hover:not(:disabled) {
+      background: var(--bg-hover);
+      border-color: var(--border-hover);
+    }
+  }
+  
+  &.button-tertiary {
+    background: var(--button-tertiary-bg);
+    color: var(--button-tertiary-text);
+    border: none;
+    
+    &:hover:not(:disabled) {
+      background: var(--bg-hover);
+    }
+  }
+}
+
+// Icon Buttons
+.icon-button {
+  color: var(--text-secondary);
+  
+  &:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+  }
+  
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+  }
+  
+  &.inverted {
+    color: var(--text-tertiary);
+    
+    &:hover {
+      color: var(--text-secondary);
+    }
+  }
+}
+
+// Navigation Components
+.navigation-bar,
+.navigation-panel,
+.ui__navigation-bar {
+  background: var(--nav-bg);
+  border-color: var(--nav-border);
+  
+  .column-link {
+    color: var(--nav-text);
+    
+    &:hover {
+      background: var(--nav-hover);
+    }
+    
+    &.active {
+      color: var(--nav-active);
+    }
+    
+    .icon {
+      color: var(--nav-icon);
+    }
+  }
+  
+  &__item {
+    color: var(--nav-icon);
+    
+    &:hover {
+      background: var(--nav-hover);
+    }
+    
+    &.active {
+      color: var(--nav-text);
+    }
+  }
+}
+
+// Account Headers and Sections
+.account__header {
+  background: var(--bg-primary);
+  
+  &__bio {
+    color: var(--text-primary);
+  }
+  
+  &__fields {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    
+    dt {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+    
+    dd {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+  }
+}
+
+.account__section-headline {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  
+  a {
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    
+    &:hover {
+      color: var(--text-primary);
+      background: var(--bg-hover);
+    }
+    
+    &.active {
+      color: var(--text-primary);
+      border-bottom-color: var(--brand-primary);
+    }
+    
+    span {
+      color: inherit;
+    }
+  }
+}
+
+// Forms and Inputs
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select,
+.input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  
+  &::placeholder {
+    color: var(--text-placeholder);
+  }
+  
+  &:focus {
+    border-color: var(--border-focus);
+    outline: none;
+  }
+}
+
+// Dropdown Menus
+.dropdown-menu {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-lg);
+  
+  &__item {
+    color: var(--text-primary);
+    
+    &:hover {
+      background: var(--bg-hover);
+    }
+    
+    &.active {
+      background: var(--bg-active);
+      color: var(--text-emphasis);
+    }
+  }
+}
+
+// Modals
+.modal-root__modal {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.modal-root__container {
+  background: var(--bg-modal-backdrop);
+}
+
+// Links - Global
+a {
+  color: var(--text-link);
+  
+  &:hover {
+    color: var(--text-link-hover);
+  }
+  
+  &:visited {
+    color: var(--text-link);
+  }
+}
+
+// Notifications
+.notification {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  
+  &__message {
+    color: var(--text-secondary);
+  }
+  
+  &__display-name {
+    color: var(--text-primary);
+  }
+}
+
+// Media Gallery
+.media-gallery {
+  background: var(--bg-secondary);
+  
+  &__item {
+    background: var(--bg-tertiary);
+  }
+}
+
+// Polls
+.poll {
+  &__option {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    
+    &:hover {
+      background: var(--bg-hover);
+    }
+    
+    &.active {
+      background: var(--bg-active);
+      border-color: var(--brand-primary);
+    }
+  }
+  
+  &__chart {
+    background: var(--brand-primary-light);
+  }
+}
+
+// Loading indicators
+.loading-indicator {
+  color: var(--text-tertiary);
+}
+
+// Empty states
+.empty-column-indicator {
+  color: var(--text-tertiary);
+}
+
+// Error states
+.error-column {
+  color: var(--semantic-danger);
+}
+
+// Column headers (if visible)
+.column-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  
+  &__button {
+    background: transparent;
+    color: var(--text-secondary);
+    
+    &:hover {
+      color: var(--text-primary);
+      background: var(--bg-hover);
+    }
+    
+    &.active {
+      color: var(--text-primary);
+      background: var(--bg-active);
+    }
+  }
+}
+
+// Search
+.search {
+  &__input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    
+    &::placeholder {
+      color: var(--text-placeholder);
+    }
+    
+    &:focus {
+      border-color: var(--border-focus);
+      background: var(--bg-secondary);
+    }
+  }
+  
+  &__icon {
+    color: var(--text-tertiary);
+  }
+}
+
+// Autosuggest
+.autosuggest-textarea__suggestions {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
+  
+  &__item {
+    color: var(--text-primary);
+    
+    &:hover,
+    &.active {
+      background: var(--bg-hover);
+    }
+  }
+}
+
+// Emoji picker
+.emoji-picker-dropdown__menu {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+// Trends
+.trends {
+  &__item {
+    border-bottom: 1px solid var(--border-secondary);
+    
+    &__name {
+      color: var(--text-primary);
+    }
+    
+    &__count {
+      color: var(--text-secondary);
+    }
+  }
+}
+
+// Lists
+.list {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  
+  &__item {
+    border-bottom: 1px solid var(--border-secondary);
+    color: var(--text-primary);
+    
+    &:hover {
+      background: var(--bg-hover);
+    }
+  }
+}
+
+// Cards
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  
+  &:hover {
+    box-shadow: var(--card-shadow-hover);
+  }
+  
+  &__title {
+    color: var(--text-primary);
+  }
+  
+  &__description {
+    color: var(--text-secondary);
+  }
+}
+
+// Tables
+table {
+  th {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+  }
+  
+  td {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-secondary);
+  }
+  
+  tr:hover td {
+    background: var(--bg-hover);
+  }
+}
+
+// Badges
+.badge {
+  background: var(--brand-primary);
+  color: var(--button-primary-text);
+  
+  &--success {
+    background: var(--semantic-success);
+  }
+  
+  &--warning {
+    background: var(--semantic-warning);
+  }
+  
+  &--danger {
+    background: var(--semantic-danger);
+  }
+}
+
+// Toasts and alerts
+.flash-message {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
+  
+  &--success {
+    border-color: var(--semantic-success);
+  }
+  
+  &--warning {
+    border-color: var(--semantic-warning);
+  }
+  
+  &--error {
+    border-color: var(--semantic-danger);
+  }
+}

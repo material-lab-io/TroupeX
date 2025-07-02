@@ -3,31 +3,31 @@
 @use 'variables' as *;
 
 :root {
-  --dropdown-border-color: #e0e0e0;
-  --dropdown-background-color: #ffffff;
-  --dropdown-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --modal-background-color: #{rgba($white, 0.95)};
-  --modal-background-variant-color: #{$white};
-  --modal-border-color: #e0e0e0;
-  --background-border-color: #e0e0e0;
+  --dropdown-border-color: var(--border-primary, #2f3336);
+  --dropdown-background-color: var(--bg-elevated, #16181c);
+  --dropdown-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 25%));
+  --modal-background-color: var(--bg-modal-backdrop, rgba(91, 112, 131, 40%));
+  --modal-background-variant-color: var(--bg-elevated, #16181c);
+  --modal-border-color: var(--border-primary, #2f3336);
+  --background-border-color: var(--border-primary, #2f3336);
   --background-filter: none;
-  --background-color: #f3f2ef; // LinkedIn gray background
-  --background-color-tint: #{rgba(#f3f2ef, 0.95)};
-  --surface-background-color: #ffffff; // White cards
-  --surface-variant-background-color: #ffffff;
-  --surface-variant-active-background-color: #fafafa;
-  --on-surface-color: #{color.adjust($ui-base-color, $alpha: -0.5)};
+  --background-color: var(--bg-primary, #000);
+  --background-color-tint: var(--bg-elevated, #16181c);
+  --surface-background-color: var(--bg-secondary, #16181c);
+  --surface-variant-background-color: var(--bg-tertiary, #1e2126);
+  --surface-variant-active-background-color: var(--bg-hover, rgba(255, 255, 255, 3%));
+  --on-surface-color: var(--text-muted, rgba(113, 118, 123, 50%));
   --avatar-border-radius: 8px;
-  --media-outline-color: #{rgba($gold-star, 0.15)};
-  --overlay-icon-shadow: drop-shadow(0 0 8px #{rgba($base-shadow-color, 0.35)});
-  --error-background-color: #{darken($error-red, 16%)};
-  --error-active-background-color: #{darken($error-red, 12%)};
-  --on-error-color: #fff;
+  --media-outline-color: rgba(212, 175, 55, 15%);
+  --overlay-icon-shadow: var(--shadow-lg, 0 4px 16px rgba(0, 0, 0, 30%));
+  --error-background-color: var(--semantic-danger, #f91880);
+  --error-active-background-color: var(--semantic-danger, #f91880);
+  --on-error-color: var(--text-emphasis, #fff);
   --rich-text-container-color: rgba(87, 24, 60, 100%);
   --rich-text-text-color: rgba(255, 175, 212, 100%);
   --rich-text-decorations-color: rgba(128, 58, 95, 100%);
-  --nested-card-background: #ffffff;
-  --nested-card-text: #{$secondary-text-color};
+  --nested-card-background: var(--card-bg, #000);
+  --nested-card-text: var(--text-secondary, #71767b);
   --nested-card-border: 1px solid #e0e0e0;
   --card-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 3px rgba(0, 0, 0, 0.04);
   --card-hover-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.07);

@@ -1,0 +1,206 @@
+// Centralized Theme System for TroupeX
+// This file defines the complete theming architecture using CSS custom properties
+// All color values should reference these variables, never hardcoded colors
+
+// Color Palette - Base colors that themes can use
+:root {
+  // Brand Colors
+  --brand-primary: #1d9bf0; // Twitter blue
+  --brand-primary-hover: #1a8cd8;
+  --brand-primary-light: rgba(29, 155, 240, 10%);
+  
+  // Neutral Colors - True neutrals
+  --neutral-0: #000;
+  --neutral-50: #0f0f0f;
+  --neutral-100: #16181c;
+  --neutral-150: #1a1f26;
+  --neutral-200: #1e2126;
+  --neutral-250: #202429;
+  --neutral-300: #2f3336;
+  --neutral-350: #3d4045;
+  --neutral-400: #536471;
+  --neutral-500: #71767b;
+  --neutral-600: #8b98a5;
+  --neutral-700: #9ca3af;
+  --neutral-800: #cfd9de;
+  --neutral-900: #e7e9ea;
+  --neutral-950: #f3f4f6;
+  --neutral-1000: #fff;
+  
+  // Semantic Colors
+  --semantic-success: #00ba7c;
+  --semantic-warning: #f4c430;
+  --semantic-danger: #f91880;
+  --semantic-info: #1d9bf0;
+  
+  // Shadows
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 20%);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 25%);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 30%);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 35%);
+}
+
+// Dark Theme Mapping
+body,
+body.theme-mastodon-dark,
+body.app-body,
+.theme-dark {
+  // Backgrounds
+  --bg-primary: var(--neutral-0);
+  --bg-secondary: var(--neutral-100);
+  --bg-tertiary: var(--neutral-200);
+  --bg-elevated: var(--neutral-100);
+  --bg-hover: rgba(255, 255, 255, 3%);
+  --bg-active: rgba(255, 255, 255, 5%);
+  --bg-modal-backdrop: rgba(91, 112, 131, 40%);
+  --bg-input: var(--neutral-150);
+  
+  // Text
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-500);
+  --text-tertiary: var(--neutral-400);
+  --text-placeholder: var(--neutral-400);
+  --text-link: var(--brand-primary);
+  --text-link-hover: var(--brand-primary-hover);
+  --text-muted: var(--neutral-600);
+  --text-emphasis: var(--neutral-1000);
+  
+  // Borders
+  --border-primary: var(--neutral-300);
+  --border-secondary: var(--neutral-200);
+  --border-hover: var(--neutral-350);
+  --border-focus: var(--brand-primary);
+  
+  // Interactive Elements
+  --button-primary-bg: var(--brand-primary);
+  --button-primary-bg-hover: var(--brand-primary-hover);
+  --button-primary-text: var(--neutral-1000);
+  --button-secondary-bg: transparent;
+  --button-secondary-border: var(--border-primary);
+  --button-secondary-text: var(--text-primary);
+  --button-tertiary-bg: var(--bg-tertiary);
+  --button-tertiary-text: var(--text-secondary);
+  --button-disabled-bg: var(--neutral-250);
+  --button-disabled-text: var(--neutral-400);
+  
+  // Status Colors
+  --status-success: var(--semantic-success);
+  --status-warning: var(--semantic-warning);
+  --status-danger: var(--semantic-danger);
+  --status-info: var(--semantic-info);
+  
+  // Component Specific
+  --compose-bg: var(--bg-secondary);
+  --compose-border: var(--border-primary);
+  --compose-placeholder: var(--text-placeholder);
+  --compose-text: var(--text-primary);
+  --compose-button-bg: var(--button-primary-bg);
+  --compose-button-hover: var(--button-primary-bg-hover);
+  --compose-button-disabled: var(--button-disabled-bg);
+  --nav-bg: var(--bg-primary);
+  --nav-border: var(--border-primary);
+  --nav-text: var(--text-primary);
+  --nav-icon: var(--text-secondary);
+  --nav-hover: var(--bg-hover);
+  --nav-active: var(--brand-primary);
+  --card-bg: var(--bg-primary);
+  --card-border: var(--border-primary);
+  --card-shadow: 0 0 0 1px var(--border-primary);
+  --card-shadow-hover: 0 0 0 1px var(--border-hover);
+  
+  // Transitions
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+// Light Theme Mapping (if needed in future)
+body.theme-mastodon-light,
+.theme-light {
+  // Backgrounds
+  --bg-primary: var(--neutral-1000);
+  --bg-secondary: var(--neutral-950);
+  --bg-tertiary: var(--neutral-900);
+  --bg-elevated: var(--neutral-1000);
+  --bg-hover: rgba(0, 0, 0, 3%);
+  --bg-active: rgba(0, 0, 0, 5%);
+  --bg-modal-backdrop: rgba(0, 0, 0, 40%);
+  --bg-input: var(--neutral-950);
+  
+  // Text
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-400);
+  --text-tertiary: var(--neutral-500);
+  --text-placeholder: var(--neutral-500);
+  --text-link: var(--brand-primary);
+  --text-link-hover: var(--brand-primary-hover);
+  --text-muted: var(--neutral-400);
+  --text-emphasis: var(--neutral-0);
+  
+  // Borders
+  --border-primary: var(--neutral-800);
+  --border-secondary: var(--neutral-900);
+  --border-hover: var(--neutral-700);
+  --border-focus: var(--brand-primary);
+  
+  // Light theme mappings for other variables...
+  // (keeping it minimal for now since we're focusing on dark theme)
+}
+
+// SCSS Variable Overrides - Bridge between old system and new
+// These map SCSS variables to CSS custom properties for backwards compatibility
+$primary-text-color: var(--text-primary);
+$darker-text-color: var(--text-emphasis);
+$dark-text-color: var(--text-secondary);
+$secondary-text-color: var(--text-secondary);
+$highlight-text-color: var(--text-link);
+$action-button-color: var(--button-primary-bg);
+$ui-base-color: var(--bg-secondary);
+$ui-primary-color: var(--text-secondary);
+$ui-secondary-color: var(--bg-tertiary);
+$ui-highlight-color: var(--brand-primary);
+$ui-button-color: var(--button-primary-text);
+$ui-button-background-color: var(--button-primary-bg);
+$ui-button-focus-background-color: var(--button-primary-bg-hover);
+
+// Global Resets - Apply theme to root elements
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+// Selection colors
+::selection {
+  background-color: var(--brand-primary-light);
+  color: var(--text-primary);
+}
+
+// Focus styles
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 4px;
+  
+  &:hover {
+    background: var(--border-hover);
+  }
+}

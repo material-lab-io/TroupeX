@@ -3217,12 +3217,12 @@ a.account__display-name {
     pointer-events: auto;
     background: var(--background-color);
     position: fixed;
-    width: 284px + 70px;
+    width: 320px + 70px;
     inset-inline-end: -70px;
     touch-action: pan-y;
 
     .navigation-panel {
-      width: 284px;
+      width: 320px;
       overflow-y: auto;
       scrollbar-width: thin;
 
