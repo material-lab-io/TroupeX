@@ -1,0 +1,244 @@
+// TroupeX Minimal Login Page Styles
+// Mobile-first, dark theme, centered design
+
+.troupex-login-page {
+  background: #0f1419 !important;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  // Hide default Mastodon header/footer on login but keep container
+  .header,
+  .footer {
+    display: none !important;
+  }
+  
+  // Hide the default logo and form container, we have our own
+  .logo-container {
+    display: none !important;
+  }
+}
+
+.troupex-login-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.troupex-login-box {
+  background: #1a1f26;
+  border: 1px solid #38444d;
+  border-radius: 16px;
+  padding: 40px 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
+
+  @media (min-width: 768px) {
+    padding: 48px 32px;
+  }
+}
+
+.troupex-logo-container {
+  text-align: center;
+  margin-bottom: 40px;
+
+  .troupex-login-logo {
+    height: 60px;
+    width: auto;
+    filter: brightness(0) invert(1); // Make logo white
+  }
+}
+
+.troupex-login-methods {
+  .login-method-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 20px;
+    margin-bottom: 12px;
+    background: #22272e;
+    border: 1px solid #38444d;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not([data-disabled='true']) {
+      background: #2d333b;
+      border-color: #566b7a;
+      transform: translateY(-1px);
+    }
+
+    &[data-disabled='true'] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    i {
+      margin-right: 12px;
+      font-size: 18px;
+    }
+
+    &.google-login i {
+      color: #4285f4;
+    }
+
+    &.phone-login i {
+      color: #25d366;
+    }
+
+    .coming-soon {
+      position: absolute;
+      right: 16px;
+      font-size: 12px;
+      color: #808080;
+      font-style: italic;
+    }
+  }
+
+  .login-divider {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+
+    span {
+      background: #1a1f26;
+      padding: 0 16px;
+      color: #808080;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #38444d;
+    }
+  }
+}
+
+.troupex-login-form {
+  .fields-group {
+    margin-bottom: 16px;
+  }
+
+  .troupex-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #22272e;
+    border: 1px solid #38444d;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: #808080;
+    }
+
+    &:focus {
+      background: #2d333b;
+      border-color: #1d9bf0;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+    }
+  }
+
+  .troupex-login-button {
+    width: 100%;
+    padding: 14px 20px;
+    background: #1d9bf0;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: #1a8cd8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(29, 155, 240, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.troupex-login-footer {
+  text-align: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #38444d;
+  font-size: 14px;
+  color: #808080;
+
+  .troupex-link {
+    color: #1d9bf0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #1a8cd8;
+      text-decoration: underline;
+    }
+  }
+
+  span {
+    margin: 0 8px;
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 480px) {
+  .troupex-login-box {
+    padding: 32px 20px;
+  }
+
+  .troupex-logo-container {
+    margin-bottom: 32px;
+
+    .troupex-login-logo {
+      height: 48px;
+    }
+  }
+
+  .login-method-button {
+    font-size: 15px;
+    padding: 12px 16px;
+
+    .coming-soon {
+      font-size: 11px;
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .troupex-login-box {
+    border-color: #666666;
+  }
+
+  .login-method-button,
+  .troupex-input {
+    border-color: #666666;
+  }
+}

@@ -12,6 +12,8 @@
     %p.lead= t('edit_profile.hint_html')
 
     %h4= t('edit_profile.basic_information')
+    
+    = render 'persona_fields'
 
     .fields-row
       .fields-row__column.fields-row__column-6
@@ -21,7 +23,7 @@
         .fields-group
           = f.input :note, wrapper: :with_block_label, input_html: { maxlength: Account::NOTE_LENGTH_LIMIT }
 
-      .fields-row__column.fields-group.fields-row__column-6
+      .fields-row__column.fields-group.fields-row__column-6.hidden
         .input.with_block_label
           %label= t('simple_form.labels.defaults.fields')
           %span.hint= t('simple_form.hints.account.fields')
@@ -47,21 +49,6 @@
               = material_symbol 'delete'
               = t('generic.delete')
 
-    .fields-row
-      .fields-row__column.fields-row__column-6
-        .fields-group
-          = f.input :header,
-                    hint: t('simple_form.hints.defaults.header', dimensions: Account::Header::HEADER_GEOMETRY, size: number_to_human_size(Account::Header::HEADER_LIMIT)),
-                    input_html: { accept: Account::Header::HEADER_IMAGE_MIME_TYPES.join(',') },
-                    wrapper: :with_block_label
-
-      .fields-row__column.fields-row__column-6
-        .fields-group
-          = image_tag @account.header.url, class: 'fields-group__thumbnail', id: 'account_header-preview'
-          - if @account.header.present?
-            = link_to settings_profile_picture_path('header'), data: { method: :delete }, class: 'link-button link-button--destructive' do
-              = material_symbol 'delete'
-              = t('generic.delete')
 
     %h4= t('edit_profile.other')
 

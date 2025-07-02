@@ -48,3 +48,8 @@
 // UI Fixes for consistent navigation and mobile usability
 @use 'mastodon/troupex-ui-fixes';
 @use 'mastodon/simplified-navigation-profile';
+
+// Professional Profile Components
+@use 'mastodon/components/profile_carousel';
+@use 'mastodon/components/persona_profile_editor';
+@use 'mastodon/components/persona_fields';
