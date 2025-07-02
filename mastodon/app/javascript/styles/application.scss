@@ -1,13 +1,19 @@
+// Core imports
 @use 'mastodon/functions';
 @use 'mastodon/mixins';
 @use 'mastodon/variables';
 @use 'mastodon/css_variables';
+
+// Fonts
 @use 'fonts/roboto';
 @use 'fonts/roboto-mono';
 
+// Base styles
 @use 'mastodon/reset';
 @use 'mastodon/basics';
 @use 'mastodon/branding';
+
+// Components
 @use 'mastodon/containers';
 @use 'mastodon/lists';
 @use 'mastodon/widgets';
@@ -18,16 +24,23 @@
 @use 'mastodon/modal';
 @use 'mastodon/emoji_picker';
 @use 'mastodon/annual_reports';
+
+// Pages
 @use 'mastodon/about';
 @use 'mastodon/tables';
 @use 'mastodon/admin';
 @use 'mastodon/dashboard';
+
+// Utilities
 @use 'mastodon/rtl';
 @use 'mastodon/accessibility';
 @use 'mastodon/rich_text';
-@use 'mastodon/troupe-cards';
+
+// TroupeX customizations
 @use 'mastodon/troupe-footer';
-@use 'mastodon/troupe-linkedin';
-@use 'mastodon/troupex-branding';
-@use 'mastodon/troupex-theme-override';
+@use 'mastodon/troupex-branding'; // Structural styles only
 @use 'mastodon/settings-navigation';
+
+// Centralized Theme System
+@use 'mastodon/theme-system'; // CSS custom properties architecture
+@use 'mastodon/theme-components'; // Apply theme to all components

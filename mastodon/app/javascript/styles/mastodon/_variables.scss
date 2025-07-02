@@ -23,7 +23,7 @@ $red-bookmark: $warning-red;
 // Values from the classic Mastodon UI - LinkedIn-inspired theme
 $classic-base-color: #f3f2ef; // LinkedIn light gray background
 $classic-primary-color: #191919; // Dark text for readability
-$classic-secondary-color: #666666; // Medium gray for secondary text
+$classic-secondary-color: #666; // Medium gray for secondary text
 $classic-highlight-color: #0a66c2; // LinkedIn blue for accents
 
 // Variables for defaults in UI
@@ -34,22 +34,19 @@ $simple-background-color: $white !default;
 $valid-value-color: $success-green !default;
 $error-value-color: $error-red !default;
 
-// Tell UI to use selected colors - LinkedIn-style hierarchy
-$ui-base-color: #f3f2ef !default; // Light gray backdrop
-$ui-base-lighter-color: #ffffff !default; // White cards
-$ui-primary-color: $classic-primary-color !default; // Light grey text
-$ui-secondary-color: $classic-secondary-color !default; // Near white
-$ui-highlight-color: $classic-highlight-color !default;
-$ui-button-color: $white !default;
-$ui-button-background-color: #0a66c2 !default; // LinkedIn blue
-$ui-button-focus-background-color: #004182 !default; // Darker blue
-$ui-button-focus-outline-color: #0a66c2 !default;
+// Tell UI to use dark theme colors for SASS compilation
+$ui-base-color: #16181c !default;
+$ui-base-lighter-color: #000 !default;
+$ui-primary-color: #71767b !default;
+$ui-secondary-color: #1e2126 !default;
+$ui-highlight-color: #1d9bf0 !default;
+$ui-button-color: #fff !default;
+$ui-button-background-color: #1d9bf0 !default;
+$ui-button-focus-background-color: #1a8cd8 !default;
+$ui-button-focus-outline-color: #1d9bf0 !default;
 $ui-button-focus-outline: solid 2px $ui-button-focus-outline-color !default;
 
-$ui-button-disabled-color: color.adjust(
-  $ui-button-background-color,
-  $alpha: -0.3
-) !default;
+$ui-button-disabled-color: rgba(29, 155, 240, 70%) !default;
 
 $ui-button-secondary-color: $blurple-500 !default;
 $ui-button-secondary-border-color: $blurple-500 !default;
@@ -65,16 +62,16 @@ $ui-button-destructive-background-color: $red-500 !default;
 $ui-button-destructive-focus-background-color: $red-600 !default;
 
 $ui-button-icon-focus-outline: $ui-button-focus-outline !default;
-$ui-button-icon-hover-background-color: rgba(212, 175, 55, 20%) !default;
+$ui-button-icon-hover-background-color: rgba(255, 255, 255, 3%) !default;
 
-// Variables for texts - LinkedIn-style readability
-$primary-text-color: #191919 !default; // Dark text on light background
-$darker-text-color: #000000 !default; // Pure black for emphasis
-$dark-text-color: #5e5e5e !default; // Medium gray
-$secondary-text-color: #666666 !default; // Lighter gray
-$highlight-text-color: #0a66c2 !default; // LinkedIn blue
-$action-button-color: #0a66c2 !default; // LinkedIn blue
-$action-button-focus-color: #004182 !default; // Darker blue
+// Variables for texts - Dark theme colors
+$primary-text-color: #e7e9ea !default;
+$darker-text-color: #fff !default;
+$dark-text-color: #71767b !default;
+$secondary-text-color: #71767b !default;
+$highlight-text-color: #1d9bf0 !default;
+$action-button-color: #1d9bf0 !default;
+$action-button-focus-color: #1a8cd8 !default;
 $passive-text-color: $gold-star !default;
 $active-passive-text-color: $success-green !default;
 
