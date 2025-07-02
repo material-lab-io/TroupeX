@@ -210,8 +210,6 @@ jobs:
         create_volume_if_not_exists "troupex_postgres_data"
         create_volume_if_not_exists "troupex_redis_data"
         create_volume_if_not_exists "troupex_public_system"
-        create_volume_if_not_exists "troupex_public_assets"
-        create_volume_if_not_exists "troupex_public_packs"
         
         # Create networks
         create_network_if_not_exists "troupex_external" "external"
@@ -261,8 +259,6 @@ jobs:
               - redis
             volumes:
               - public_system:/mastodon/public/system
-              - public_assets:/mastodon/public/assets
-              - public_packs:/mastodon/public/packs
 
           streaming:
             image: ${{ needs.prepare.outputs.streaming-image }}
@@ -291,7 +287,6 @@ jobs:
               - internal_network
             volumes:
               - public_system:/mastodon/public/system
-              - public_packs:/mastodon/public/packs
 
         networks:
           external_network:
@@ -310,12 +305,6 @@ jobs:
             external: true
           public_system:
             name: troupex_public_system
-            external: true
-          public_assets:
-            name: troupex_public_assets
-            external: true
-          public_packs:
-            name: troupex_public_packs
             external: true
         EOF
         
