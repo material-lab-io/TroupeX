@@ -1,15 +1,18 @@
+// Import profile variables
+@import '../variables/profile';
+
 // Profile Photo Carousel Styles
 .profile-photo-carousel {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: $profile-thumbnail-size;
+  height: $profile-thumbnail-size;
   margin: 0 auto 20px;
 
   &--single {
     .profile-photo-carousel__photo {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: $profile-thumbnail-size;
+      height: $profile-thumbnail-size;
       border-radius: 50%;
       overflow: hidden;
       cursor: pointer;
@@ -24,33 +27,25 @@
   // Frame mode - large rectangular with curved corners
   &--frame {
     width: 100%;
-    max-width: 800px;
-    aspect-ratio: 3/4;
+    max-width: $profile-image-max-width;
+    aspect-ratio: $profile-image-aspect-ratio;
     height: auto;
-    margin: 0 auto 40px;
+    margin: 0 auto $profile-frame-margin-bottom;
     
     .profile-photo-carousel__photo {
       position: relative;
       width: 100%;
       height: 100%;
-      border-radius: 32px;
+      border-radius: $profile-frame-border-radius;
       overflow: hidden;
       background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
-      box-shadow: 
-        30px 30px 80px #bebebe,
-        -30px -30px 80px #ffffff,
-        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
-        inset -2px -2px 4px rgba(0, 0, 0, 0.1);
-      padding: 16px;
-      transition: all 0.3s ease;
+      box-shadow: $profile-neumorphic-shadow-light;
+      padding: $profile-frame-padding;
+      transition: all $profile-transition-duration $profile-transition-easing;
       cursor: pointer;
       
       &:hover {
-        box-shadow: 
-          35px 35px 90px #bebebe,
-          -35px -35px 90px #ffffff,
-          inset 2px 2px 4px rgba(255, 255, 255, 0.9),
-          inset -2px -2px 4px rgba(0, 0, 0, 0.15);
+        box-shadow: $profile-neumorphic-shadow-light-hover;
       }
       
       .profile-photo-carousel__frame-image {
@@ -61,8 +56,37 @@
         box-shadow: 
           inset 0 3px 6px rgba(0, 0, 0, 0.1),
           0 2px 4px rgba(0, 0, 0, 0.05);
+        opacity: 1;
+        transition: opacity $profile-transition-duration $profile-transition-easing;
+      }
+      
+      &--loading {
+        .profile-photo-carousel__frame-image {
+          opacity: 0;
+        }
       }
     }
+  }
+  
+  &__loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    &-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-primary);
+      border-top-color: var(--brand-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 
   &__container {
@@ -323,14 +347,14 @@
   }
   
   &__bio-prominent {
-    max-width: 800px;
-    margin: 20px auto 30px;
+    max-width: $profile-image-max-width;
+    margin: $profile-bio-margin-top auto $profile-bio-margin-bottom;
     padding: 0 20px;
     text-align: center;
     
     .account__header__content {
-      font-size: 18px;
-      line-height: 1.6;
+      font-size: $profile-bio-font-size;
+      line-height: $profile-bio-line-height;
       color: var(--text-primary);
       
       p {
@@ -521,18 +545,10 @@
     &--frame {
       .profile-photo-carousel__photo {
         background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-        box-shadow: 
-          20px 20px 60px #0a0a0a,
-          -20px -20px 60px #3a3a3a,
-          inset 1px 1px 2px rgba(255, 255, 255, 0.1),
-          inset -1px -1px 2px rgba(0, 0, 0, 0.5);
+        box-shadow: $profile-neumorphic-shadow-dark;
         
         &:hover {
-          box-shadow: 
-            25px 25px 75px #0a0a0a,
-            -25px -25px 75px #3a3a3a,
-            inset 1px 1px 2px rgba(255, 255, 255, 0.15),
-            inset -1px -1px 2px rgba(0, 0, 0, 0.6);
+          box-shadow: $profile-neumorphic-shadow-dark-hover;
         }
       }
     }
@@ -553,15 +569,15 @@
     }
     
     &--frame {
-      max-width: 90vw;
-      max-height: 70vh;
+      max-width: $profile-image-max-width-mobile;
+      max-height: $profile-image-mobile-max-height;
       
       .profile-photo-carousel__photo {
-        border-radius: 16px;
-        padding: 8px;
+        border-radius: $profile-frame-border-radius-mobile;
+        padding: $profile-frame-padding-mobile;
         
         .profile-photo-carousel__frame-image {
-          border-radius: 12px;
+          border-radius: $profile-frame-image-border-radius-mobile;
         }
       }
     }

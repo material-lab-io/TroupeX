@@ -2,6 +2,9 @@ import { useCallback, useState, useEffect } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
+import classNames from 'classnames';
+
+import type { IconProp } from '@/mastodon/components/icon';
 import { Icon } from '@/mastodon/components/icon';
 import { IconButton } from '@/mastodon/components/icon_button';
 import type { PersonaType } from '@/mastodon/components/persona_profile_display';
@@ -36,7 +39,7 @@ const messages = defineMessages({
 interface PersonaOption {
   value: PersonaType;
   label: string;
-  icon: React.ComponentType;
+  icon: IconProp;
   roles: string[];
 }
 
@@ -72,6 +75,22 @@ interface Credit {
   year?: string;
   role?: string;
 }
+
+// Validation helpers
+const validateCredit = (credit: Credit): boolean => {
+  return credit.project.trim().length > 0;
+};
+
+const validateYear = (year: string): boolean => {
+  if (!year) return true; // Year is optional
+  const yearNum = parseInt(year, 10);
+  const currentYear = new Date().getFullYear();
+  return !isNaN(yearNum) && yearNum >= 1900 && yearNum <= currentYear + 5;
+};
+
+const validateFavorite = (favorite: string): boolean => {
+  return favorite.trim().length > 0;
+};
 
 export const PersonaProfileEditor: React.FC = () => {
   const intl = useIntl();
@@ -146,12 +165,16 @@ export const PersonaProfileEditor: React.FC = () => {
 
   // Update hidden form fields when data changes
   const updateFormFields = useCallback(() => {
+    // Filter out invalid credits and favorites
+    const validCredits = credits.filter(validateCredit);
+    const validFavorites = favorites.filter(validateFavorite);
+    
     const fieldsData = [
       { name: 'Role', value: role },
-      { name: 'Credits', value: JSON.stringify(credits.filter(c => c.project)) },
+      { name: 'Credits', value: JSON.stringify(validCredits) },
       { name: 'One Day', value: oneDay },
       { name: 'Dream', value: dream },
-      { name: 'Favorites', value: JSON.stringify(favorites.filter(Boolean)) },
+      { name: 'Favorites', value: JSON.stringify(validFavorites) },
       { name: 'carousel_photos', value: JSON.stringify(carouselPhotos) },
     ];
 
@@ -232,7 +255,7 @@ export const PersonaProfileEditor: React.FC = () => {
               className={`persona-profile-editor__persona-option ${persona === option.value ? 'active' : ''}`}
               onClick={() => { handlePersonaChange(option.value); }}
             >
-              <Icon id={option.value} icon={option.icon as any} />
+              <Icon id={option.value} icon={option.icon} />
               <span>{option.label}</span>
             </button>
           ))}
@@ -274,7 +297,11 @@ export const PersonaProfileEditor: React.FC = () => {
                 placeholder={intl.formatMessage(messages.yearPlaceholder)}
                 value={credit.year || ''}
                 onChange={(e) => { handleCreditChange(index, 'year', e.target.value); }}
-                className='persona-profile-editor__input persona-profile-editor__input--small'
+                className={classNames('persona-profile-editor__input', 'persona-profile-editor__input--small', {
+                  'persona-profile-editor__input--error': credit.year && !validateYear(credit.year),
+                })}
+                pattern='[0-9]{4}'
+                maxLength={4}
               />
               <input
                 type='text'

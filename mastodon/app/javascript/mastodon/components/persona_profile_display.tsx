@@ -7,13 +7,14 @@ import MovieIcon from '@/material-icons/400-24px/movie.svg?react';
 import PhotoCameraIcon from '@/material-icons/400-24px/photo_camera.svg?react';
 import SettingsIcon from '@/material-icons/400-24px/settings.svg?react';
 import StarIcon from '@/material-icons/400-24px/star.svg?react';
+import type { IconProp } from 'mastodon/components/icon';
 import { Icon } from 'mastodon/components/icon';
 import type { Account } from 'mastodon/models/account';
 
 export type PersonaType = 'creative' | 'technical' | 'production' | 'support';
 
 interface PersonaConfig {
-  icon: React.ComponentType;
+  icon: IconProp;
   color: string;
   roles: string[];
 }
@@ -92,7 +93,12 @@ const parseProfileFields = (fields: ProfileField[]): ParsedProfile => {
           if (Array.isArray(parsed)) {
             profile.credits = parsed as { project: string; year?: string; role?: string }[];
           }
-        } catch {
+        } catch (error) {
+          // Log parsing error in development
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Failed to parse credits JSON:', error);
+            console.warn('Falling back to text parsing for value:', value);
+          }
           // Try to parse as simple text list
           profile.credits = value.split(/[,\n]/).map(credit => ({
             project: credit.trim(),
@@ -119,7 +125,12 @@ const parseProfileFields = (fields: ProfileField[]): ParsedProfile => {
           if (Array.isArray(parsed)) {
             profile.favorites = parsed as string[];
           }
-        } catch {
+        } catch (error) {
+          // Log parsing error in development
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Failed to parse favorites JSON:', error);
+            console.warn('Falling back to text parsing for value:', value);
+          }
           profile.favorites = value.split(/[,\n]/).map(f => f.trim()).filter(Boolean);
         }
         break;
@@ -133,7 +144,7 @@ export const PersonaProfileDisplay: React.FC<{
   account: Account;
 }> = ({ account }) => {
   // Convert Immutable List to array if needed
-  const fields = account.fields?.toArray ? account.fields.toArray() : [];
+  const fields = account.fields.toArray ? account.fields.toArray() : [];
   const profile = parseProfileFields(fields as ProfileField[]);
   const PersonaIcon = PERSONA_CONFIGS[profile.persona].icon;
   const personaColor = PERSONA_CONFIGS[profile.persona].color;
@@ -149,7 +160,7 @@ export const PersonaProfileDisplay: React.FC<{
           className='persona-profile__role'
           style={{ backgroundColor: personaColor }}
         >
-          <Icon id={profile.persona} icon={PersonaIcon as any} />
+          <Icon id={profile.persona} icon={PersonaIcon} />
           <span>{profile.role}</span>
         </div>
       </div>

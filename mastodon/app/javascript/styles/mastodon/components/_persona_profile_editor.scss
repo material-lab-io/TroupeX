@@ -110,6 +110,16 @@
     &--small {
       flex: 0 0 100px;
     }
+    
+    &--error {
+      border-color: var(--status-danger);
+      background-color: rgba(249, 24, 128, 0.1);
+      
+      &:focus {
+        border-color: var(--status-danger);
+        box-shadow: 0 0 0 2px rgba(249, 24, 128, 0.2);
+      }
+    }
   }
 
   &__textarea {

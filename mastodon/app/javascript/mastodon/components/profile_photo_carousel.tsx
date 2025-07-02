@@ -7,6 +7,7 @@ import {
 
 import { defineMessages, useIntl } from 'react-intl';
 
+import classNames from 'classnames';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 
@@ -32,6 +33,7 @@ interface ProfilePhoto {
   url: string;
   thumbnail?: string;
   description?: string;
+  srcSet?: string;
 }
 
 export const ProfilePhotoCarousel: React.FC<{
@@ -68,6 +70,7 @@ export const ProfilePhotoCarousel: React.FC<{
 
   // Handle slide change
   const [slideIndex, setSlideIndex] = useState(0);
+  const [imageLoading, setImageLoading] = useState(true);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const handleSlideChange = useCallback(
     (direction: number) => {
@@ -103,6 +106,14 @@ export const ProfilePhotoCarousel: React.FC<{
       onPhotoClick(slideIndex);
     }
   }, [onPhotoClick, slideIndex]);
+  
+  const handleImageLoad = useCallback(() => {
+    setImageLoading(false);
+  }, []);
+  
+  const handleImageError = useCallback(() => {
+    setImageLoading(false);
+  }, []);
 
   // Animation for slide transitions
   const slideStyles = useSpring({
@@ -116,17 +127,33 @@ export const ProfilePhotoCarousel: React.FC<{
       return (
         <div className='profile-photo-carousel profile-photo-carousel--single profile-photo-carousel--frame'>
           <div 
-            className='profile-photo-carousel__photo'
+            className={classNames('profile-photo-carousel__photo', {
+              'profile-photo-carousel__photo--loading': imageLoading,
+            })}
             onClick={handlePhotoClick}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handlePhotoClick(); }}
+            onKeyDown={(e) => { 
+              if (e.key === 'Enter' || e.key === ' ') {
+                handlePhotoClick();
+              }
+            }}
             role={editable ? 'button' : undefined}
             tabIndex={editable ? 0 : undefined}
           >
             <img
               src={autoPlayGif ? photos[0]?.url : (photos[0]?.thumbnail ?? photos[0]?.url)}
+              srcSet={photos[0]?.srcSet}
+              sizes="(max-width: 767px) 90vw, 800px"
               alt={photos[0]?.description ?? ''}
               className='profile-photo-carousel__frame-image'
+              loading="lazy"
+              onLoad={handleImageLoad}
+              onError={handleImageError}
             />
+            {imageLoading && (
+              <div className='profile-photo-carousel__loading'>
+                <div className='profile-photo-carousel__loading-spinner' />
+              </div>
+            )}
             {editable && (
               <div className='profile-photo-carousel__edit-overlay'>
                 <Icon id='camera' icon={AddPhotoAlternateIcon} />
@@ -186,14 +213,21 @@ export const ProfilePhotoCarousel: React.FC<{
                 total: photos.length,
               })}
               onClick={handlePhotoClick}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handlePhotoClick(); }}
+              onKeyDown={(e) => { 
+              if (e.key === 'Enter' || e.key === ' ') {
+                handlePhotoClick();
+              }
+            }}
               role={editable ? 'button' : undefined}
               tabIndex={editable && index === slideIndex ? 0 : undefined}
             >
               <img
                 src={autoPlayGif ? photo.url : (photo.thumbnail ?? photo.url)}
+                srcSet={photo.srcSet}
+                sizes="(max-width: 767px) 100px, 120px"
                 alt={photo.description ?? ''}
                 className='profile-photo-carousel__image'
+                loading="lazy"
               />
               {editable && index === slideIndex && (
                 <div className='profile-photo-carousel__edit-overlay'>
