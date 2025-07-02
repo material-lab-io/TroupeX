@@ -292,8 +292,8 @@ jobs:
               - external_network
               - internal_network
             volumes:
-              - public-system:/mastodon/public/system
-              - public-packs:/mastodon/public/packs
+              - public_system:/mastodon/public/system
+              - public_packs:/mastodon/public/packs
 
         networks:
           external_network:
