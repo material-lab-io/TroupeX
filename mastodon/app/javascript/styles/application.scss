@@ -40,6 +40,8 @@
 @use 'mastodon/troupe-footer';
 @use 'mastodon/troupex-branding'; // Structural styles only
 @use 'mastodon/settings-navigation';
+@use 'mastodon/troupex-login'; // Minimal login page design
+@use 'mastodon/troupex-explore'; // Explore/landing page with animated background
 
 // Centralized Theme System
 @use 'mastodon/theme-system'; // CSS custom properties architecture
