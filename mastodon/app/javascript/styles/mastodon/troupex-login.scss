@@ -1,5 +1,29 @@
 // TroupeX Minimal Login Page Styles
-// Mobile-first, dark theme, centered design
+// Mobile-first, dark theme, centered design with animated background
+
+// Organic animated background
+@keyframes organic-flow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1) rotate(120deg);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9) rotate(240deg);
+  }
+}
+
+@keyframes organic-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
 
 .troupex-login-page {
   background: #0f1419 !important;
@@ -8,6 +32,77 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+  
+  // Animated background elements
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  
+  &::before {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #1d9bf0 0%, transparent 70%);
+    top: -200px;
+    right: -200px;
+    animation: organic-flow 20s ease-in-out infinite;
+  }
+  
+  &::after {
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, #7856ff 0%, transparent 70%);
+    bottom: -300px;
+    left: -300px;
+    animation: organic-flow 25s ease-in-out infinite reverse;
+  }
+}
+
+// Additional floating orbs
+.organic-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+  
+  &.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #1d9bf0 0%, transparent 60%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: organic-pulse 15s ease-in-out infinite;
+  }
+  
+  &.orb-2 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, #f91880 0%, transparent 60%);
+    top: 20%;
+    left: 70%;
+    animation: organic-flow 18s ease-in-out infinite;
+  }
+  
+  &.orb-3 {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, #00ba7c 0%, transparent 60%);
+    bottom: 20%;
+    right: 60%;
+    animation: organic-flow 22s ease-in-out infinite reverse;
+  }
+}
+
+.troupex-login-page {
 
   // Hide default Mastodon header/footer on login but keep container
   .header,
@@ -25,14 +120,18 @@
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .troupex-login-box {
-  background: #1a1f26;
-  border: 1px solid #38444d;
+  background: rgba(26, 31, 38, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 68, 77, 0.5);
   border-radius: 16px;
   padding: 40px 24px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
   @media (min-width: 768px) {
     padding: 48px 32px;

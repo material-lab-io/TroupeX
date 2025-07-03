@@ -2,15 +2,19 @@
   = vite_typescript_tag 'public.tsx', crossorigin: 'anonymous'
 
 - content_for :content do
-  .container-alt
-    .logo-container
-      %h1
-        = link_to root_path do
-          = logo_as_symbol(:wordmark)
+  - if content_for?(:body_classes) && yield(:body_classes).include?('troupex-login-page')
+    = render 'flashes'
+    = yield
+  - else
+    .container-alt
+      .logo-container
+        %h1
+          = link_to root_path do
+            = logo_as_symbol(:wordmark)
 
-    .form-container
-      = render 'flashes'
+      .form-container
+        = render 'flashes'
 
-      = yield
+        = yield
 
 = render template: 'layouts/application'

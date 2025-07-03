@@ -14,6 +14,7 @@ import { Search } from 'mastodon/features/compose/components/search';
 import { useBreakpoint } from 'mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from 'mastodon/identity_context';
 
+import ExploreWrapper from './components/explore_wrapper';
 import Links from './links';
 import Statuses from './statuses';
 import Suggestions from './suggestions';
@@ -34,73 +35,75 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   }, []);
 
   return (
-    <Column
-      bindToDocument={!multiColumn}
-      ref={columnRef}
-      label={intl.formatMessage(messages.title)}
-    >
-      <ColumnHeader
-        icon={'explore'}
-        iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
-        title={intl.formatMessage(messages.title)}
-        onClick={handleHeaderClick}
-        multiColumn={multiColumn}
-      />
+    <ExploreWrapper>
+      <Column
+        bindToDocument={!multiColumn}
+        ref={columnRef}
+        label={intl.formatMessage(messages.title)}
+      >
+        <ColumnHeader
+          icon={'explore'}
+          iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
+          title={intl.formatMessage(messages.title)}
+          onClick={handleHeaderClick}
+          multiColumn={multiColumn}
+        />
 
-      <div className='explore__search-header'>
-        <Search singleColumn />
-      </div>
+        <div className='explore__search-header'>
+          <Search singleColumn />
+        </div>
 
-      <div className='account__section-headline'>
-        <NavLink exact to='/explore'>
-          <FormattedMessage
-            tagName='div'
-            id='explore.trending_statuses'
-            defaultMessage='Posts'
-          />
-        </NavLink>
-
-        <NavLink exact to='/explore/tags'>
-          <FormattedMessage
-            tagName='div'
-            id='explore.trending_tags'
-            defaultMessage='Hashtags'
-          />
-        </NavLink>
-
-        {signedIn && (
-          <NavLink exact to='/explore/suggestions'>
+        <div className='account__section-headline'>
+          <NavLink exact to='/explore'>
             <FormattedMessage
               tagName='div'
-              id='explore.suggested_follows'
-              defaultMessage='People'
+              id='explore.trending_statuses'
+              defaultMessage='Posts'
             />
           </NavLink>
-        )}
 
-        <NavLink exact to='/explore/links'>
-          <FormattedMessage
-            tagName='div'
-            id='explore.trending_links'
-            defaultMessage='News'
-          />
-        </NavLink>
-      </div>
+          <NavLink exact to='/explore/tags'>
+            <FormattedMessage
+              tagName='div'
+              id='explore.trending_tags'
+              defaultMessage='Hashtags'
+            />
+          </NavLink>
 
-      <Switch>
-        <Route path='/explore/tags' component={Tags} />
-        <Route path='/explore/links' component={Links} />
-        <Route path='/explore/suggestions' component={Suggestions} />
-        <Route exact path={['/explore', '/explore/posts']}>
-          <Statuses multiColumn={multiColumn} />
-        </Route>
-      </Switch>
+          {signedIn && (
+            <NavLink exact to='/explore/suggestions'>
+              <FormattedMessage
+                tagName='div'
+                id='explore.suggested_follows'
+                defaultMessage='People'
+              />
+            </NavLink>
+          )}
 
-      <Helmet>
-        <title>{intl.formatMessage(messages.title)}</title>
-        <meta name='robots' content='all' />
-      </Helmet>
-    </Column>
+          <NavLink exact to='/explore/links'>
+            <FormattedMessage
+              tagName='div'
+              id='explore.trending_links'
+              defaultMessage='News'
+            />
+          </NavLink>
+        </div>
+
+        <Switch>
+          <Route path='/explore/tags' component={Tags} />
+          <Route path='/explore/links' component={Links} />
+          <Route path='/explore/suggestions' component={Suggestions} />
+          <Route exact path={['/explore', '/explore/posts']}>
+            <Statuses multiColumn={multiColumn} />
+          </Route>
+        </Switch>
+
+        <Helmet>
+          <title>{intl.formatMessage(messages.title)}</title>
+          <meta name='robots' content='all' />
+        </Helmet>
+      </Column>
+    </ExploreWrapper>
   );
 };
 

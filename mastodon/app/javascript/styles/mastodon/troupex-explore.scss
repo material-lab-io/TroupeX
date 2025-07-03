@@ -1,0 +1,485 @@
+// TroupeX Explore/Landing Page Styles
+// Minimalist design inspired by poke.cx
+
+// Animation constants
+$animation-duration: 8s;
+$thumb-reach-offset: 20vh;
+$desktop-offset: 10vh;
+
+// Subtle animations
+@keyframes subtle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Explore page wrapper styles - Applied directly
+.explore-page-wrapper.no-logged-in {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #000000;
+  z-index: 9998;
+  
+  // Subtle gradient background
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000000 100%);
+    z-index: 0;
+  }
+  
+  // Subtle animated orb
+  &::after {
+    content: '';
+    position: fixed;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(29, 155, 240, 0.05) 0%, transparent 50%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: subtle-float $animation-duration ease-in-out infinite;
+    z-index: 0;
+    will-change: transform;
+  }
+}
+
+// Hide navigation elements when not logged in and on explore page
+body.explore-not-logged-in {
+  // Hide all navigation elements
+  .troupex-navigation,
+  .navigation-bar,
+  .mobile-navigation-controller,
+  .ui__navigation-bar,
+  .tabs-bar__wrapper,
+  .tabs-bar,
+  .ui__header {
+    display: none;
+  }
+  
+  // Hide the columns area background and controls
+  .columns-area {
+    background: transparent;
+    
+    // Hide drawer and other elements
+    .drawer,
+    .drawer__header,
+    .drawer__tab,
+    .column-back-button,
+    .column-header {
+      display: none;
+    }
+  }
+  
+  // Make sure the explore wrapper takes full screen
+  .column {
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 0;
+    background: transparent;
+  }
+}
+
+// Minimal container
+.explore-minimal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+  padding: 40px 20px;
+  
+  @media (min-width: 768px) {
+    padding: 60px 40px;
+  }
+}
+
+// Content area
+.explore-minimal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fade-in 1s ease-out;
+  
+  .troupex-wordmark-minimal {
+    height: 60px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+    margin-bottom: 24px;
+    
+    @media (min-width: 768px) {
+      height: 80px;
+      margin-bottom: 32px;
+    }
+  }
+  
+  .minimal-tagline {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+    text-transform: lowercase;
+    margin: 0;
+    
+    @media (min-width: 768px) {
+      font-size: 16px;
+    }
+  }
+}
+
+// CTA container positioned at bottom
+.explore-cta-container {
+  display: flex;
+  justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: fade-in 1.5s ease-out;
+  
+  .btn-get-started {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 48px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    border-radius: 32px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    
+    // Thumb-friendly touch target
+    min-height: 48px;
+    min-width: 200px;
+    
+    // Position for optimal thumb reach
+    @media (max-width: 768px) {
+      margin-bottom: $thumb-reach-offset; // 20% from bottom for thumb ergonomics
+    }
+    
+    @media (min-width: 769px) {
+      margin-bottom: $desktop-offset;
+      padding: 18px 56px;
+      font-size: 17px;
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+      
+      &::before {
+        transform: translateX(0);
+      }
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+// Login popup styles
+.explore-login-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  // Backdrop filter with fallback
+  @supports (backdrop-filter: blur(10px)) {
+    backdrop-filter: blur(10px);
+  }
+  @supports (-webkit-backdrop-filter: blur(10px)) {
+    -webkit-backdrop-filter: blur(10px);
+  }
+  // Fallback for browsers without backdrop-filter support
+  @supports not (backdrop-filter: blur(10px)) {
+    background: rgba(0, 0, 0, 0.95);
+  }
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  
+  &.active {
+    opacity: 1;
+    visibility: visible;
+    
+    .explore-login-modal {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .explore-login-modal {
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 40px 30px;
+    max-width: 400px;
+    width: 100%;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    
+    @media (min-width: 768px) {
+      padding: 48px 40px;
+    }
+  }
+  
+  .login-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+  
+  .login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+    
+    img {
+      height: 50px;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+  }
+  
+  .login-form {
+    .login-options {
+      margin-bottom: 20px;
+    }
+    
+    .login-option-button {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.9);
+        transform: translateY(-1px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+    
+    .login-divider {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+      
+      span {
+        background: #1a1a1a;
+        padding: 0 10px;
+        color: rgba(255, 255, 255, 0.4);
+        position: relative;
+        z-index: 1;
+      }
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    .login-social-options {
+      text-align: center;
+      
+      .login-social-text {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 14px;
+        margin: 0;
+      }
+    }
+  }
+  
+  .login-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    
+    a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: #ffffff;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Mobile optimizations
+@media (max-width: 480px) {
+  .explore-minimal-content {
+    .troupex-wordmark-minimal {
+      height: 50px;
+    }
+    
+    .minimal-tagline {
+      font-size: 13px;
+    }
+  }
+  
+  .explore-cta-container {
+    .btn-get-started {
+      padding: 14px 40px;
+      font-size: 15px;
+      min-width: 180px;
+    }
+  }
+}
+
+// Landscape orientation adjustments
+@media (max-height: 600px) and (orientation: landscape) {
+  .explore-minimal-container {
+    padding: 20px;
+  }
+  
+  .explore-minimal-content {
+    .troupex-wordmark-minimal {
+      height: 40px;
+      margin-bottom: 16px;
+    }
+    
+    .minimal-tagline {
+      font-size: 12px;
+    }
+  }
+  
+  .explore-cta-container {
+    .btn-get-started {
+      margin-bottom: 5vh;
+      padding: 12px 36px;
+      font-size: 14px;
+    }
+  }
+}
+
+// Loading state
+.explore-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000000;
+  z-index: 9999;
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .explore-page-wrapper.no-logged-in {
+    background: #000000;
+    
+    &::before {
+      display: none;
+    }
+  }
+  
+  .explore-cta-container {
+    .btn-get-started {
+      border: 2px solid #ffffff;
+    }
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .explore-page-wrapper.no-logged-in::after {
+    animation: none;
+  }
+  
+  .explore-minimal-content,
+  .explore-cta-container {
+    animation: none;
+  }
+}
