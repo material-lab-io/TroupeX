@@ -1,6 +1,11 @@
 // TroupeX Explore/Landing Page Styles
 // Minimalist design inspired by poke.cx
 
+// Animation constants
+$animation-duration: 8s;
+$thumb-reach-offset: 20vh;
+$desktop-offset: 10vh;
+
 // Subtle animations
 @keyframes subtle-float {
   0%, 100% {
@@ -32,7 +37,7 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
-  background: #000000 !important;
+  background: #000000;
   z-index: 9998;
   
   // Subtle gradient background
@@ -58,8 +63,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    animation: subtle-float 8s ease-in-out infinite;
+    animation: subtle-float $animation-duration ease-in-out infinite;
     z-index: 0;
+    will-change: transform;
   }
 }
 
@@ -73,12 +79,12 @@ body.explore-not-logged-in {
   .tabs-bar__wrapper,
   .tabs-bar,
   .ui__header {
-    display: none !important;
+    display: none;
   }
   
   // Hide the columns area background and controls
   .columns-area {
-    background: transparent !important;
+    background: transparent;
     
     // Hide drawer and other elements
     .drawer,
@@ -86,16 +92,16 @@ body.explore-not-logged-in {
     .drawer__tab,
     .column-back-button,
     .column-header {
-      display: none !important;
+      display: none;
     }
   }
   
   // Make sure the explore wrapper takes full screen
   .column {
-    flex: 1 1 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-    background: transparent !important;
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 0;
+    background: transparent;
   }
 }
 
@@ -183,11 +189,11 @@ body.explore-not-logged-in {
     
     // Position for optimal thumb reach
     @media (max-width: 768px) {
-      margin-bottom: 20vh; // 20% from bottom for thumb ergonomics
+      margin-bottom: $thumb-reach-offset; // 20% from bottom for thumb ergonomics
     }
     
     @media (min-width: 769px) {
-      margin-bottom: 10vh;
+      margin-bottom: $desktop-offset;
       padding: 18px 56px;
       font-size: 17px;
     }
@@ -232,8 +238,17 @@ body.explore-not-logged-in {
   justify-content: center;
   padding: 20px;
   background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  // Backdrop filter with fallback
+  @supports (backdrop-filter: blur(10px)) {
+    backdrop-filter: blur(10px);
+  }
+  @supports (-webkit-backdrop-filter: blur(10px)) {
+    -webkit-backdrop-filter: blur(10px);
+  }
+  // Fallback for browsers without backdrop-filter support
+  @supports not (backdrop-filter: blur(10px)) {
+    background: rgba(0, 0, 0, 0.95);
+  }
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -429,10 +444,21 @@ body.explore-not-logged-in {
   }
 }
 
+// Loading state
+.explore-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000000;
+  z-index: 9999;
+}
+
 // High contrast mode
 @media (prefers-contrast: high) {
   .explore-page-wrapper.no-logged-in {
-    background: #000000 !important;
+    background: #000000;
     
     &::before {
       display: none;
