@@ -164,6 +164,19 @@ class AccountTimeline extends ImmutablePureComponent {
       emptyMessage = <FormattedMessage id='empty_column.account_timeline' defaultMessage='No posts found' />;
     }
 
+    // For regular accounts, show only the cinematic profile without the feed
+    const showCinematicOnly = !forceEmptyState && accountId && !suspended && !hidden && !blockedBy;
+
+    if (showCinematicOnly) {
+      return (
+        <Column>
+          <ColumnBackButton />
+          <AccountHeader accountId={this.props.accountId} hideTabs={forceEmptyState} tagged={tagged} />
+        </Column>
+      );
+    }
+
+    // For special states (suspended, blocked, etc), show the status list with empty message
     return (
       <Column>
         <ColumnBackButton />

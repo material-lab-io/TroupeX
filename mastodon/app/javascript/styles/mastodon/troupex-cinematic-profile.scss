@@ -351,25 +351,9 @@
   .account__header__extra {
     display: none;
   }
-}
-
-// Cinematic view toggle button
-.cinematic-view-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 100;
   
-  .button {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
+  // Make cinematic view fill the entire viewport
+  .cinematic-profile-view {
+    min-height: calc(100vh - 60px); // Account for top navigation
   }
 }

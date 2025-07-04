@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -69,17 +69,17 @@ export const CinematicProfileView: React.FC<CinematicProfileViewProps> = ({ acco
   const intl = useIntl();
   
   const profileData = useMemo(() => {
-    const fieldsArray = account.fields ? account.fields.toArray() : [];
+    const fieldsArray = account.fields?.toArray() || [];
     return parseProfileData(account.note_plain || '', fieldsArray);
   }, [account.note_plain, account.fields]);
   
   const displayName = account.display_name || account.username;
-  const fieldsArray = account.fields ? account.fields.toArray() : [];
+  const fieldsArray = account.fields?.toArray() || [];
   const location = fieldsArray.find(f => f.name.toLowerCase().includes('location'))?.value;
   
-  const handleShare = () => {
+  const handleShare = useCallback(() => {
     if (navigator.share) {
-      navigator.share({
+      void navigator.share({
         title: `@${account.acct}`,
         text: intl.formatMessage(messages.shareProfile, { name: account.acct }),
         url: account.url,
@@ -88,9 +88,9 @@ export const CinematicProfileView: React.FC<CinematicProfileViewProps> = ({ acco
       });
     } else {
       // Fallback to copying URL
-      navigator.clipboard.writeText(account.url);
+      void navigator.clipboard.writeText(account.url);
     }
-  };
+  }, [account.acct, account.url, intl]);
   
   return (
     <div className={classNames('cinematic-profile-view', { 'editing': isEditing })}>

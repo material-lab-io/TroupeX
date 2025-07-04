@@ -9,13 +9,9 @@ import { NavLink } from 'react-router-dom';
 import { ProfileErrorBoundary } from '@/mastodon/components/error_boundary/profile_error_boundary';
 import { PersonaProfileDisplay } from '@/mastodon/components/persona_profile_display';
 import { ProfilePhotoCarousel } from '@/mastodon/components/profile_photo_carousel';
-import CheckIcon from '@/material-icons/400-24px/check.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
-import MovieIcon from '@/material-icons/400-24px/movie.svg?react';
-import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
-import NotificationsActiveIcon from '@/material-icons/400-24px/notifications_active-fill.svg?react';
 import ShareIcon from '@/material-icons/400-24px/share.svg?react';
 import {
   followAccount,
@@ -34,7 +30,6 @@ import {
 import { openModal } from 'mastodon/actions/modal';
 import { initMuteModal } from 'mastodon/actions/mutes';
 import { initReport } from 'mastodon/actions/reports';
-import { Avatar } from 'mastodon/components/avatar';
 import { Badge, AutomatedBadge, GroupBadge } from 'mastodon/components/badge';
 import { Button } from 'mastodon/components/button';
 import { CopyIconButton } from 'mastodon/components/copy_icon_button';
@@ -45,12 +40,10 @@ import {
 } from 'mastodon/components/counters';
 import { Dropdown } from 'mastodon/components/dropdown_menu';
 import { FollowButton } from 'mastodon/components/follow_button';
-import { FormattedDateWrapper } from 'mastodon/components/formatted_date';
 import { Icon } from 'mastodon/components/icon';
 import { IconButton } from 'mastodon/components/icon_button';
 import { ShortNumber } from 'mastodon/components/short_number';
 import { AccountNote } from 'mastodon/features/account/components/account_note';
-import { DomainPill } from 'mastodon/features/account/components/domain_pill';
 import FollowRequestNoteContainer from 'mastodon/features/account/containers/follow_request_note_container';
 import { useLinks } from 'mastodon/hooks/useLinks';
 import { useIdentity } from 'mastodon/identity_context';
@@ -192,13 +185,6 @@ const titleFromAccount = (account: Account) => {
   return `${prefix} (@${acct})`;
 };
 
-const dateFormatOptions: Intl.DateTimeFormatOptions = {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-};
 
 export const AccountHeader: React.FC<{
   accountId: string;
@@ -215,8 +201,6 @@ export const AccountHeader: React.FC<{
   const hidden = useAppSelector((state) => getAccountHidden(state, accountId));
   const handleLinkClick = useLinks();
   
-  // State for toggling cinematic view
-  const [cinematicView, setCinematicView] = useState(true);
 
   const handleBlock = useCallback(() => {
     if (!account) {
@@ -266,17 +250,6 @@ export const AccountHeader: React.FC<{
     }
   }, [dispatch, account, relationship]);
 
-  const handleNotifyToggle = useCallback(() => {
-    if (!account) {
-      return;
-    }
-
-    if (relationship?.notifying) {
-      dispatch(followAccount(account.id, { notify: false }));
-    } else {
-      dispatch(followAccount(account.id, { notify: true }));
-    }
-  }, [dispatch, account, relationship]);
 
   const handleMute = useCallback(() => {
     if (!account) {
@@ -650,7 +623,6 @@ export const AccountHeader: React.FC<{
   }
 
   let actionBtn: React.ReactNode,
-    bellBtn: React.ReactNode,
     lockedIcon: React.ReactNode,
     shareBtn: React.ReactNode;
 
@@ -717,24 +689,6 @@ export const AccountHeader: React.FC<{
     }
   }
 
-  if (relationship?.requested || relationship?.following) {
-    bellBtn = (
-      <IconButton
-        icon={relationship.notifying ? 'bell' : 'bell-o'}
-        iconComponent={
-          relationship.notifying ? NotificationsActiveIcon : NotificationsIcon
-        }
-        active={relationship.notifying}
-        title={intl.formatMessage(
-          relationship.notifying
-            ? messages.disableNotifications
-            : messages.enableNotifications,
-          { name: account.username },
-        )}
-        onClick={handleNotifyToggle}
-      />
-    );
-  }
 
   if ('share' in navigator) {
     shareBtn = (
@@ -787,9 +741,7 @@ export const AccountHeader: React.FC<{
 
   const content = { __html: account.note_emojified };
   const displayNameHtml = { __html: account.display_name_html };
-  const fields = account.fields;
   const isLocal = !account.acct.includes('@');
-  const username = account.acct.split('@')[0];
   const domain = isLocal ? localDomain : account.acct.split('@')[1];
   const isIndexable = !account.noindex;
 
@@ -812,22 +764,11 @@ export const AccountHeader: React.FC<{
     );
   });
 
-  // Add toggle handler
-  const handleToggleCinematicView = useCallback(() => {
-    setCinematicView(!cinematicView);
-  }, [cinematicView]);
 
-  // If cinematic view is enabled, show the cinematic profile
-  if (cinematicView && account && !hidden && !suspended) {
+  // Always show cinematic view for non-hidden, non-suspended accounts
+  if (account && !hidden && !suspended) {
     return (
       <div className='account-timeline__header cinematic-mode'>
-        <div className='cinematic-view-toggle'>
-          <Button
-            text={intl.formatMessage(messages.standardView)}
-            onClick={handleToggleCinematicView}
-            secondary
-          />
-        </div>
         <CinematicProfileView account={account} />
       </div>
     );
@@ -858,7 +799,7 @@ export const AccountHeader: React.FC<{
               <ProfilePhotoCarousel
                 account={account}
                 editable={false}
-                onPhotoClick={() => { handleOpenAvatar({ currentTarget: null } as any); }}
+                onPhotoClick={handleOpenAvatar}
                 displayMode='frame'
               />
             </ProfileErrorBoundary>
