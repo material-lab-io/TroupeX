@@ -43,6 +43,31 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=sha
 
+    - name: Validate SCSS imports
+      run: |
+        echo "Checking for missing SCSS imports..."
+        cd mastodon
+        
+        # Find all custom SCSS files
+        custom_scss=$(find app/javascript/styles/mastodon -name "*.scss" -type f | grep -E "(troupex|troupe)" | sort)
+        
+        # Check if each file is imported
+        missing=""
+        for file in $custom_scss; do
+          filename=$(basename "$file" .scss)
+          if ! grep -q "@use 'mastodon/$filename'" app/javascript/styles/application.scss; then
+            missing="$missing\n  - $filename"
+          fi
+        done
+        
+        if [ -n "$missing" ]; then
+          echo "❌ ERROR: Missing SCSS imports in application.scss:"
+          echo -e "$missing"
+          exit 1
+        fi
+        
+        echo "✅ All SCSS files are properly imported"
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:

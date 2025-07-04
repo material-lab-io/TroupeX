@@ -276,3 +276,6 @@ The project is configured to work with Cloudflare tunnels for public access:
 - Default domain: `troupex-dev.materiallab.io`
 - Vite HMR requires special tunnel configuration (see vite tunnel scripts)
 - Multiple helper scripts for tunnel setup and management in root directory
+
+## Development Memories
+- Remember to reimport new CSS files when UI changes are made on application.css otherwise the docker image doesn't get built right with the latest UI.

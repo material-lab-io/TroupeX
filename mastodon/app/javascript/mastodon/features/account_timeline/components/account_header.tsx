@@ -216,7 +216,7 @@ export const AccountHeader: React.FC<{
   const handleLinkClick = useLinks();
   
   // State for toggling cinematic view
-  const [cinematicView, setCinematicView] = useState(false);
+  const [cinematicView, setCinematicView] = useState(true);
 
   const handleBlock = useCallback(() => {
     if (!account) {
