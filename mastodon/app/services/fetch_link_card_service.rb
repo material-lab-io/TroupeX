@@ -30,7 +30,8 @@ class FetchLinkCardService < BaseService
 
     attach_card if @card&.persisted?
   rescue *Mastodon::HTTP_CONNECTION_ERRORS, Addressable::URI::InvalidURIError, Mastodon::HostValidationError, Mastodon::LengthValidationError, Encoding::UndefinedConversionError, ActiveRecord::RecordInvalid => e
-    Rails.logger.debug { "Error fetching link #{@original_url}: #{e}" }
+    Rails.logger.error "FetchLinkCardService error for #{@original_url}: #{e.class} - #{e.message}"
+    Rails.logger.error e.backtrace.first(5).join("\n") if e.backtrace
     nil
   end
 
@@ -51,7 +52,11 @@ class FetchLinkCardService < BaseService
       'User-Agent' => "#{Mastodon::Version.user_agent} Bot",
     }
 
+    Rails.logger.info "FetchLinkCardService: Fetching URL #{@url}"
+    
     @html = Request.new(:get, @url).add_headers(headers).perform do |res|
+      Rails.logger.info "FetchLinkCardService: Response code #{res.code}, mime_type: #{res.mime_type}"
+      
       next unless res.code == 200 && res.mime_type == 'text/html'
 
       # We follow redirects, and ideally we want to save the preview card for
@@ -64,6 +69,8 @@ class FetchLinkCardService < BaseService
 
       res.truncated_body
     end
+    
+    Rails.logger.info "FetchLinkCardService: HTML fetch complete, got content: #{@html.present?}"
   end
 
   def attach_card

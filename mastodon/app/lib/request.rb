@@ -142,7 +142,10 @@ class Request
     end
 
     def http_client
-      HTTP.use(:auto_inflate)
+      HTTP
+        .use(:auto_inflate)
+        .timeout(connect: TIMEOUT[:connect_timeout], write: TIMEOUT[:write_timeout], read: TIMEOUT[:read_timeout])
+        .follow(max_hops: 3)
     end
   end
 
