@@ -14,6 +14,10 @@ class FetchOEmbedService
       parse_cached_endpoint!
     else
       discover_endpoint!
+      # If discovery failed but we found a cached endpoint in html method, use it
+      if @endpoint_url.nil? && @options[:cached_endpoint]
+        parse_cached_endpoint!
+      end
     end
 
     fetch!
@@ -106,8 +110,21 @@ class FetchOEmbedService
   def html
     return @html if defined?(@html)
 
-    @html = @options[:html] || Request.new(:get, @url).add_headers('Accept' => 'text/html').perform do |res|
-      res.code != 200 || res.mime_type != 'text/html' ? nil : res.body_with_limit
+    @html = @options[:html] || begin
+      Request.new(:get, @url).add_headers('Accept' => 'text/html').perform do |res|
+        res.code != 200 || res.mime_type != 'text/html' ? nil : res.body_with_limit
+      end
+    rescue Mastodon::LengthValidationError => e
+      # If the HTML is too large (common with YouTube), check if we have a cached endpoint
+      url_domain = Addressable::URI.parse(@url).normalized_host
+      cached = Rails.cache.read("oembed_endpoint:#{url_domain}")
+      if cached
+        Rails.logger.info "FetchOEmbedService: HTML too large for #{@url}, using cached endpoint"
+        @options[:cached_endpoint] = cached
+        return nil
+      end
+      Rails.logger.warn "FetchOEmbedService: HTML too large for #{@url}, no cached endpoint available"
+      nil
     end
   end
 end

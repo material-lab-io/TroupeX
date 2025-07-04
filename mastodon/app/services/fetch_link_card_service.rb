@@ -117,10 +117,17 @@ class FetchLinkCardService < BaseService
     url_domain      = Addressable::URI.parse(@url).normalized_host
     cached_endpoint = Rails.cache.read("oembed_endpoint:#{url_domain}")
 
+    Rails.logger.info "FetchLinkCardService: Attempting oEmbed for #{@url}, cached endpoint: #{cached_endpoint}"
+    
     embed   = service.call(@url, cached_endpoint: cached_endpoint) unless cached_endpoint.nil?
     embed ||= service.call(@url, html: html) unless html.nil?
 
-    return false if embed.nil?
+    if embed.nil?
+      Rails.logger.info "FetchLinkCardService: No oEmbed data found for #{@url}"
+      return false
+    end
+    
+    Rails.logger.info "FetchLinkCardService: oEmbed data found - type: #{embed[:type]}, thumbnail: #{embed[:thumbnail_url]}"
 
     url = Addressable::URI.parse(service.endpoint_url)
 
@@ -147,7 +154,14 @@ class FetchLinkCardService < BaseService
       @card.width            = embed[:width].presence  || 0
       @card.height           = embed[:height].presence || 0
       @card.html             = Sanitize.fragment(embed[:html], Sanitize::Config::MASTODON_OEMBED)
-      @card.image_remote_url = (url + embed[:thumbnail_url]).to_s if embed[:thumbnail_url].present?
+      # For video embeds, try to fetch the thumbnail
+      if embed[:thumbnail_url].present?
+        begin
+          @card.image_remote_url = (url + embed[:thumbnail_url]).to_s
+        rescue => e
+          Rails.logger.error "FetchLinkCardService: Failed to set video thumbnail: #{e.message}"
+        end
+      end
     when 'rich'
       # Most providers rely on <script> tags, which is a no-no
       return false
