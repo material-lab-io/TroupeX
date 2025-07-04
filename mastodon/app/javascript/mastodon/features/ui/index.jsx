@@ -183,10 +183,9 @@ class SwitchingColumnsArea extends PureComponent {
       }
     } else if (singleUserMode && owner && initialState?.accounts[owner]) {
       redirect = <Redirect from='/' to={`/@${initialState.accounts[owner].username}`} exact />;
-    } else if (trendsEnabled && trendsAsLanding) {
-      redirect = <Redirect from='/' to='/explore' exact />;
     } else {
-      redirect = <Redirect from='/' to='/about' exact />;
+      // Always redirect to explore page for TroupeX
+      redirect = <Redirect from='/' to='/explore' exact />;
     }
 
     // Handle settings routes by redirecting to server-side Rails routes

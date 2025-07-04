@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -13,6 +13,7 @@ import CheckIcon from '@/material-icons/400-24px/check.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
+import MovieIcon from '@/material-icons/400-24px/movie.svg?react';
 import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
 import NotificationsActiveIcon from '@/material-icons/400-24px/notifications_active-fill.svg?react';
 import ShareIcon from '@/material-icons/400-24px/share.svg?react';
@@ -63,6 +64,7 @@ import {
 import { getAccountHidden } from 'mastodon/selectors/accounts';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
+import { CinematicProfileView } from './cinematic_profile_view';
 import { FamiliarFollowers } from './familiar_followers';
 import { MemorialNote } from './memorial_note';
 import { MovedNote } from './moved_note';
@@ -70,6 +72,8 @@ import { MovedNote } from './moved_note';
 const messages = defineMessages({
   unblock: { id: 'account.unblock', defaultMessage: 'Unblock @{name}' },
   edit_profile: { id: 'account.edit_profile', defaultMessage: 'Edit profile' },
+  cinematicView: { id: 'account.cinematic_view', defaultMessage: 'Cinematic View' },
+  standardView: { id: 'account.standard_view', defaultMessage: 'Standard View' },
   linkVerifiedOn: {
     id: 'account.link_verified_on',
     defaultMessage: 'Ownership of this link was checked on {date}',
@@ -199,7 +203,8 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
 export const AccountHeader: React.FC<{
   accountId: string;
   hideTabs?: boolean;
-}> = ({ accountId, hideTabs }) => {
+  hideBar?: boolean;
+}> = ({ accountId, hideBar }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const { signedIn, permissions } = useIdentity();
@@ -209,6 +214,9 @@ export const AccountHeader: React.FC<{
   );
   const hidden = useAppSelector((state) => getAccountHidden(state, accountId));
   const handleLinkClick = useLinks();
+  
+  // State for toggling cinematic view
+  const [cinematicView, setCinematicView] = useState(false);
 
   const handleBlock = useCallback(() => {
     if (!account) {
@@ -804,6 +812,27 @@ export const AccountHeader: React.FC<{
     );
   });
 
+  // Add toggle handler
+  const handleToggleCinematicView = useCallback(() => {
+    setCinematicView(!cinematicView);
+  }, [cinematicView]);
+
+  // If cinematic view is enabled, show the cinematic profile
+  if (cinematicView && account && !hidden && !suspended) {
+    return (
+      <div className='account-timeline__header cinematic-mode'>
+        <div className='cinematic-view-toggle'>
+          <Button
+            text={intl.formatMessage(messages.standardView)}
+            onClick={handleToggleCinematicView}
+            secondary
+          />
+        </div>
+        <CinematicProfileView account={account} />
+      </div>
+    );
+  }
+
   return (
     <div className='account-timeline__header'>
       {!hidden && account.memorial && <MemorialNote />}
@@ -823,17 +852,13 @@ export const AccountHeader: React.FC<{
             <FollowRequestNoteContainer account={account} />
           )}
 
-        <div className='account__header__professional'>
-          {/* Info badges moved to below profile */}
-        </div>
-
-        <div className='account__header__bar'>
+        {!hideBar && <div className='account__header__bar'>
           <div className='account__header__profile-frame'>
             <ProfileErrorBoundary>
               <ProfilePhotoCarousel
                 account={account}
                 editable={false}
-                onPhotoClick={() => handleOpenAvatar({ currentTarget: null } as any)}
+                onPhotoClick={() => { handleOpenAvatar({ currentTarget: null } as any); }}
                 displayMode='frame'
               />
             </ProfileErrorBoundary>
@@ -946,9 +971,9 @@ export const AccountHeader: React.FC<{
               </div>
             </div>
           )}
-        </div>
-      </div>
+        </div>}
 
+      </div>
 
       <Helmet>
         <title>{titleFromAccount(account)}</title>

@@ -1,0 +1,375 @@
+// TroupeX Cinematic Profile Styles
+// Dark theme with high contrast for film industry professionals
+
+.cinematic-profile-view {
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+// Hero Section with large profile photo
+.cinematic-profile-hero {
+  position: relative;
+  height: 60vh;
+  min-height: 400px;
+  overflow: hidden;
+  background: #0a0a0a;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.1) 40%,
+      rgba(0, 0, 0, 0.4) 80%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+    z-index: 1;
+  }
+  
+  &__content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    @media (min-width: 768px) {
+      padding: 4rem 3rem;
+    }
+  }
+  
+  &__info {
+    text-align: left;
+    color: #ffffff;
+    max-width: 800px;
+  }
+  
+  &__name {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+    
+    @media (min-width: 768px) {
+      font-size: 24px;
+    }
+  }
+  
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+  }
+  
+  &__location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    
+    .icon {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+  }
+  
+  &__stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    
+    .cinematic-profile-stat {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      
+      &__value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      &__label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: lowercase;
+      }
+    }
+  }
+}
+
+// Content Section
+.cinematic-profile-content {
+  background: #000000;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  
+  @media (min-width: 768px) {
+    padding: 4rem 3rem;
+  }
+}
+
+// Stats Bar
+.cinematic-profile-stats {
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cinematic-profile-stat {
+  
+  &__value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.125rem;
+  }
+  
+  &__label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// Profile Sections
+.cinematic-profile-section {
+  margin-bottom: 3rem;
+  
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 10px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.01em;
+    
+    .icon {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      opacity: 0.7;
+    }
+  }
+  
+  &__content {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 800px;
+  }
+}
+
+// List Styles
+.cinematic-profile-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+  &__item {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    
+    &::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+// Skills Tags
+.cinematic-profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cinematic-profile-tag {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+// Inspirations
+.cinematic-profile-inspirations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cinematic-profile-inspiration {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.85);
+  
+  &:not(:last-child)::after {
+    content: '|';
+    margin-left: 1rem;
+    color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+// Mobile Optimizations
+@media (max-width: 767px) {
+  .cinematic-profile-hero {
+    height: 50vh;
+    min-height: 350px;
+    
+    &__content {
+      padding: 2rem 1.5rem;
+    }
+    
+    &__name {
+      font-size: 24px;
+    }
+  }
+  
+  .cinematic-profile-stats {
+    justify-content: space-around;
+    gap: 1.5rem;
+  }
+  
+  .cinematic-profile-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .cinematic-profile-section {
+    &__title {
+      font-size: 1.25rem;
+    }
+    
+    &__content {
+      font-size: 1rem;
+    }
+  }
+  
+  .cinematic-profile-list__item {
+    font-size: 1rem;
+  }
+}
+
+// High Contrast Mode
+@media (prefers-contrast: high) {
+  .cinematic-profile-hero {
+    &__overlay {
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.8) 50%,
+        rgba(0, 0, 0, 1) 100%
+      );
+    }
+  }
+  
+  .cinematic-profile-tag {
+    border-width: 2px;
+  }
+}
+
+// Animation for entrance
+@keyframes cinematic-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cinematic-profile-section {
+  animation: cinematic-fade-in 0.6s ease-out;
+  animation-fill-mode: both;
+  
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1s};
+    }
+  }
+}
+
+// Integration with existing Mastodon styles
+.account__header {
+  &.cinematic-mode {
+    background: transparent;
+    padding: 0;
+    
+    .account__header__image {
+      display: none;
+    }
+    
+    .account__header__content {
+      display: none;
+    }
+  }
+}
+
+// When in cinematic mode, hide regular profile elements
+.account-timeline__header.cinematic-mode {
+  .account__header__tabs,
+  .account__header__extra {
+    display: none;
+  }
+}
+
+// Cinematic view toggle button
+.cinematic-view-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  
+  .button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
