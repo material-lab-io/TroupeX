@@ -59,8 +59,8 @@
 
       .fields-row__column.fields-row__column-6
         .fields-group
-          = image_tag @account.header.url, class: 'fields-group__thumbnail', id: 'account_header-preview', style: 'width: 100%; height: auto;'
           - if @account.header.present?
+            = image_tag @account.header.url, class: 'fields-group__thumbnail', id: 'account_header-preview', style: 'width: 100%; height: auto;', alt: 'Profile header'
             = link_to settings_profile_picture_path('header'), data: { method: :delete }, class: 'link-button link-button--destructive' do
               = material_symbol 'delete'
               = t('generic.delete')

@@ -10,7 +10,6 @@ import MovieIcon from '@/material-icons/400-24px/movie.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import ShareIcon from '@/material-icons/400-24px/share.svg?react';
 import StarIcon from '@/material-icons/400-24px/star.svg?react';
-import { Avatar } from 'mastodon/components/avatar';
 import { Icon } from 'mastodon/components/icon';
 import { IconButton } from 'mastodon/components/icon_button';
 import { me } from 'mastodon/initial_state';
@@ -22,7 +21,6 @@ const messages = defineMessages({
   skills: { id: 'cinematic_profile.skills', defaultMessage: 'Skills' },
   achievements: { id: 'cinematic_profile.achievements', defaultMessage: 'Achievements' },
   inspirations: { id: 'cinematic_profile.inspirations', defaultMessage: 'Inspirations' },
-  responsibilities: { id: 'cinematic_profile.responsibilities', defaultMessage: 'Responsibilities' },
   editProfile: { id: 'account.edit_profile', defaultMessage: 'Edit profile' },
   shareProfile: { id: 'account.share', defaultMessage: 'Share @{name}\'s profile' },
 });
@@ -39,7 +37,6 @@ interface ParsedProfileData {
   skills?: string[];
   achievements?: string[];
   inspirations?: string[];
-  responsibilities?: string[];
 }
 
 // Parse bio text for structured data using special markers

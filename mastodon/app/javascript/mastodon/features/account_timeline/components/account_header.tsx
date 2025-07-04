@@ -1,4 +1,3 @@
-import type React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
@@ -205,7 +204,7 @@ export const AccountHeader: React.FC<{
   accountId: string;
   hideTabs?: boolean;
   hideBar?: boolean;
-}> = ({ accountId, hideTabs, hideBar }) => {
+}> = ({ accountId, hideBar }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const { signedIn, permissions } = useIdentity();
