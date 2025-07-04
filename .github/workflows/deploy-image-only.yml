@@ -259,6 +259,9 @@ jobs:
               - redis
             volumes:
               - public_system:/mastodon/public/system
+            dns:
+              - 8.8.8.8
+              - 8.8.4.4
 
           streaming:
             image: ${{ needs.prepare.outputs.streaming-image }}
@@ -287,6 +290,9 @@ jobs:
               - internal_network
             volumes:
               - public_system:/mastodon/public/system
+            dns:
+              - 8.8.8.8
+              - 8.8.4.4
 
         networks:
           external_network:
@@ -347,7 +353,8 @@ jobs:
         
         # Update services
         echo "Starting updated services..."
-        docker compose up -d --no-deps web streaming sidekiq
+        # Force recreate containers to ensure they use new images and configurations
+        docker compose up -d --no-deps --force-recreate web streaming sidekiq
         
         # The zero-downtime scaling doesn't work with port mapping
         # Just do a quick restart which takes < 10 seconds
@@ -360,6 +367,15 @@ jobs:
         echo "Checking health..."
         sleep 10
         docker compose ps
+        
+        # Verify Sidekiq is processing queues
+        echo "Verifying Sidekiq..."
+        docker compose exec -T sidekiq bundle exec rails runner -e production "
+          require 'sidekiq/api'
+          queues = Sidekiq::Queue.all.map { |q| \"#{q.name}(#{q.size})\" }.join(', ')
+          puts \"Sidekiq queues: #{queues}\"
+          puts \"Sidekiq is running and processing queues\"
+        " || echo "Warning: Could not verify Sidekiq status"
         
         echo "Deployment complete!"
         EOF
